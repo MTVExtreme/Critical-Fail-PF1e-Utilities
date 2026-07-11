@@ -1,0 +1,108 @@
+/* Critical Fail PF1e Utilities — Surge Chance */
+
+.critical-fail-pf1e-utilities.info-box.cf-surge-chance,
+.cf-surge-chance.info-box {
+  cursor: pointer;
+}
+
+.cf-surge-chance .value.cf-surge-chance-value {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Spells tab: sit under Concentration / CL row */
+.spellbook-configuration .summary .cf-surge-chance {
+  align-self: stretch;
+}
+
+/* Spheres tab: CL stays a normal attribute box; Surge sits under it */
+.tab.spheres .attribute-grid:has(.cf-surge-cl-column) {
+  max-height: none;
+  grid-template-rows: 1rem auto auto;
+}
+
+.tab.spheres .cf-surge-cl-column {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.tab.spheres .cf-surge-cl-column > .attribute.cl {
+  flex: 0 0 auto;
+}
+
+.tab.spheres .cf-surge-chance-spheres {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.15rem 0.35rem 0.25rem;
+  border-radius: 0.5rem;
+  border: 0.1rem solid rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  text-align: center;
+  line-height: 1.15;
+  font-family: "Modesto Condensed Bold", "Signika", "Palatino Linotype", serif;
+}
+
+.tab.spheres .cf-surge-chance-spheres:hover {
+  background: rgba(120, 46, 34, 0.12);
+}
+
+.tab.spheres .cf-surge-chance-spheres .cf-surge-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.tab.spheres .cf-surge-chance-spheres .cf-surge-chance-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+/* Actor Settings tab */
+.tab.settings .cf-surge-actor-settings {
+  margin-top: 0.75rem;
+}
+
+.tab.settings .cf-surge-actor-settings .hint {
+  opacity: 0.85;
+  font-size: 0.85em;
+}
+
+/* Item Details — surge disable */
+.tab.details .cf-surge-item-disable {
+  margin-top: 0.75rem;
+}
+
+.tab.details .cf-surge-item-disable .hint {
+  opacity: 0.85;
+  font-size: 0.85em;
+}
+
+/* Chat card emphasis */
+.chat-message .cf-surge-result.surged {
+  color: #9b1b1b;
+  font-weight: 700;
+}
+
+.chat-message .cf-surge-result.safe {
+  color: #1b5e20;
+  font-weight: 700;
+}
+
+.chat-message .cf-surge-severity {
+  font-weight: 700;
+}
+
+.chat-message .cf-surge-die.discarded {
+  text-decoration: line-through;
+  opacity: 0.65;
+}
+
+.chat-message .cf-surge-die.kept {
+  font-weight: 700;
+}
