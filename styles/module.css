@@ -63,6 +63,47 @@
   font-weight: 700;
 }
 
+/* Spheres tab: Spheres of Guile block (rows reuse pf1spheres li.sphere styling) */
+.tab.spheres .cf-guile-section {
+  margin-top: 0.75rem;
+}
+
+.tab.spheres .cf-guile-header-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tab.spheres .cf-guile-header-row .cf-guile-header {
+  flex: 1;
+  font-family: "Modesto Condensed Bold", "Signika", "Palatino Linotype", serif;
+  font-size: var(--font-size-24, 24px);
+}
+
+.tab.spheres .cf-guile-oam {
+  flex: 0 0 auto;
+  padding: 0.1rem 0.5rem;
+  border-radius: 0.5rem;
+  border: 0.1rem solid rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.3);
+  font-family: "Modesto Condensed Bold", "Signika", "Palatino Linotype", serif;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+.tab.spheres .cf-guile-spheres {
+  margin-top: 0.3rem;
+}
+
+.tab.spheres li.sphere .talent.grid.cf-guile-disabled .talent-name {
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
+.tab.spheres li.sphere .talent.grid .talent-icon {
+  cursor: pointer;
+}
+
 /* Actor Settings tab */
 .tab.settings .cf-surge-actor-settings {
   margin-top: 0.75rem;

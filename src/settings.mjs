@@ -24,6 +24,18 @@ export function registerSettings() {
     config: true,
     type: new foundry.data.fields.BooleanField({ initial: true }),
   });
+
+  game.settings.register(MODULE_ID, "enableGuileTab", {
+    name: "CFUTIL.Settings.enableGuileTab",
+    hint: "CFUTIL.Settings.enableGuileTabHint",
+    scope: "world",
+    config: true,
+    type: new foundry.data.fields.BooleanField({ initial: true }),
+  });
+}
+
+export function isGuileTabEnabled() {
+  return game.settings.get(MODULE_ID, "enableGuileTab") === true;
 }
 
 export function isSurgeEnabled() {

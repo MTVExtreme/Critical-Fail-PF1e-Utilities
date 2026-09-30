@@ -25,6 +25,31 @@ export const FLAG_ACTION_DISABLE_SURGE = "actionSurgeDisable";
 /** Life sphere key in pf1spheres */
 export const LIFE_SPHERE_KEY = "life";
 
+/** Skill ranks a skill sphere grants per talent spent in it (capped at Hit Dice). */
+export const GUILE_RANKS_PER_TALENT = 5;
+
+/** Skill spheres whose base sphere grants no associated-skill ranks. */
+export const GUILE_SPHERES_WITHOUT_BASE_RANKS = ["vocation"];
+
+/** pf1spheres skill sphere key → Spheres of Power Wiki page slug */
+export const GUILE_WIKI_SLUGS = {
+  artifice: "artifice",
+  bluster: "bluster",
+  bodyControl: "body-control",
+  communication: "communication",
+  faction: "faction",
+  herbalism: "herbalism",
+  infiltration: "infiltration",
+  investigation: "investigation",
+  navigation: "navigation",
+  performance: "performance",
+  spellhacking: "spellhacking",
+  study: "study",
+  subterfuge: "subterfuge",
+  survivalism: "survivalism",
+  vocation: "vocation",
+};
+
 export const DICE_MODES = {
   normal: { formula: "1d100", labelKey: "CFUTIL.Surge.DiceNormal" },
   kh: { formula: "2d100kh", labelKey: "CFUTIL.Surge.DiceKeepHigher" },
