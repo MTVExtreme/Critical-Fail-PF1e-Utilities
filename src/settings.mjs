@@ -1,4 +1,4 @@
-import { MODULE_ID } from "./constants.mjs";
+import { MODULE_ID, ROLL_STATS_SETTING } from "./constants.mjs";
 
 export function registerSettings() {
   game.settings.register(MODULE_ID, "enableSurgeChance", {
@@ -32,10 +32,30 @@ export function registerSettings() {
     config: true,
     type: new foundry.data.fields.BooleanField({ initial: true }),
   });
+
+  game.settings.register(MODULE_ID, "enableRollTracking", {
+    name: "CFUTIL.Settings.enableRollTracking",
+    hint: "CFUTIL.Settings.enableRollTrackingHint",
+    scope: "world",
+    config: true,
+    type: new foundry.data.fields.BooleanField({ initial: true }),
+  });
+
+  // Recorded d20 / damage data. Lives in the world settings database, independent of the chat log.
+  game.settings.register(MODULE_ID, ROLL_STATS_SETTING, {
+    scope: "world",
+    config: false,
+    type: new foundry.data.fields.ObjectField(),
+    default: { v: 1, actors: {} },
+  });
 }
 
 export function isGuileTabEnabled() {
   return game.settings.get(MODULE_ID, "enableGuileTab") === true;
+}
+
+export function isRollTrackingEnabled() {
+  return game.settings.get(MODULE_ID, "enableRollTracking") === true;
 }
 
 export function isSurgeEnabled() {

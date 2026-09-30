@@ -25,6 +25,9 @@ export const FLAG_ACTION_DISABLE_SURGE = "actionSurgeDisable";
 /** Life sphere key in pf1spheres */
 export const LIFE_SPHERE_KEY = "life";
 
+/** World setting key holding recorded d20 / damage data for the Roll Stats tool. */
+export const ROLL_STATS_SETTING = "rollStatsData";
+
 /** Skill ranks a skill sphere grants per talent spent in it (capped at Hit Dice). */
 export const GUILE_RANKS_PER_TALENT = 5;
 

@@ -100,8 +100,372 @@
   text-decoration: line-through;
 }
 
-.tab.spheres li.sphere .talent.grid .talent-icon {
+/* Talent icon: show the item image, swap to the "post to chat" bubble on hover */
+.tab.spheres li.sphere.cf-guile-sphere .talent.grid .talent-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
   cursor: pointer;
+}
+
+.tab.spheres li.sphere.cf-guile-sphere .talent.grid .talent-icon > img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  border: none;
+}
+
+.tab.spheres li.sphere.cf-guile-sphere .talent.grid .talent-icon > i {
+  display: none;
+  font-size: 18px;
+  line-height: 24px;
+}
+
+.tab.spheres li.sphere.cf-guile-sphere .talent.grid .talent-icon:hover > img {
+  display: none;
+}
+
+.tab.spheres li.sphere.cf-guile-sphere .talent.grid .talent-icon:hover > i {
+  display: inline-block;
+}
+
+/* Actors sidebar: Roll Stats button */
+.directory-footer .cf-roll-stats-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+/* Roll Stats popup */
+.cf-roll-stats .window-content {
+  overflow: hidden;
+}
+
+.cf-roll-stats .cf-rs-root {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 0;
+  height: 100%;
+}
+
+.cf-roll-stats .cf-rs-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.6rem;
+}
+
+.cf-roll-stats .cf-rs-filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: var(--font-size-12, 12px);
+}
+
+.cf-roll-stats .cf-rs-filters label > span {
+  opacity: 0.8;
+}
+
+.cf-roll-stats .cf-rs-filters select,
+.cf-roll-stats .cf-rs-filters input[type="date"] {
+  min-width: 9rem;
+}
+
+.cf-roll-stats .cf-rs-actions {
+  display: flex;
+  gap: 0.3rem;
+  margin-left: auto;
+}
+
+.cf-roll-stats .cf-rs-actions button {
+  width: 2.2rem;
+  height: 2rem;
+  padding: 0;
+}
+
+.cf-roll-stats .cf-rs-range {
+  margin: 0;
+  font-size: var(--font-size-13, 13px);
+}
+
+.cf-roll-stats .cf-rs-warning {
+  margin-left: 0.5rem;
+  color: #b3261e;
+  font-weight: 600;
+}
+
+.cf-roll-stats .cf-rs-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.cf-roll-stats .cf-rs-search input {
+  min-width: 11rem;
+}
+
+.cf-roll-stats .cf-rs-search-count {
+  margin-left: 0.5rem;
+  opacity: 0.75;
+}
+
+.cf-roll-stats h3 {
+  margin: 0.75rem 0 0.25rem;
+  border-bottom: 1px solid var(--color-border-light-primary, #7a7971);
+  font-size: var(--font-size-16, 16px);
+}
+
+.cf-roll-stats h3 small {
+  margin-left: 0.5rem;
+  font-size: var(--font-size-11, 11px);
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+/* Each table lives in its own capped, scrollable panel (about 14 rows on a 1080p screen) */
+.cf-roll-stats .cf-rs-table-wrap {
+  position: relative;
+  max-height: clamp(220px, 40vh, 420px);
+  overflow: auto;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 0.4rem;
+  background: rgba(255, 255, 255, 0.15);
+  scrollbar-width: thin;
+}
+
+.cf-roll-stats table.cf-rs-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #e8e2d4;
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
+.cf-roll-stats table.cf-rs-table tfoot td {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  background: #e8e2d4;
+  box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.25);
+  font-weight: 700;
+}
+
+.theme-dark .cf-roll-stats table.cf-rs-table thead th,
+.theme-dark .cf-roll-stats table.cf-rs-table tfoot td,
+.cf-roll-stats.theme-dark table.cf-rs-table thead th,
+.cf-roll-stats.theme-dark table.cf-rs-table tfoot td {
+  background: #2c2b33;
+}
+
+.cf-roll-stats table.cf-rs-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.cf-roll-stats table.cf-rs-table th.sortable:hover {
+  text-shadow: 0 0 6px var(--color-shadow-primary, #ff6400);
+}
+
+.cf-roll-stats table.cf-rs-table th.sortable.active {
+  text-decoration: underline;
+}
+
+.cf-roll-stats table.cf-rs-table th.sortable i {
+  margin-left: 0.2rem;
+}
+
+.cf-roll-stats table.cf-rs-table tbody tr[hidden] {
+  display: none;
+}
+
+.cf-roll-stats .cf-rs-comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.cf-roll-stats .cf-rs-compare {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: 0.4rem;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  background: rgba(255, 255, 255, 0.25);
+  font-size: var(--font-size-12, 12px);
+}
+
+.cf-roll-stats .cf-rs-compare strong {
+  font-size: var(--font-size-14, 14px);
+}
+
+.cf-roll-stats .cf-rs-compare.nat20 i {
+  color: #1b5e20;
+}
+
+.cf-roll-stats .cf-rs-compare.nat1 i {
+  color: #9b1b1b;
+}
+
+.cf-roll-stats table.cf-rs-table {
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  font-size: var(--font-size-12, 12px);
+}
+
+.cf-roll-stats table.cf-rs-table th,
+.cf-roll-stats table.cf-rs-table td {
+  padding: 0.2rem 0.35rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.cf-roll-stats table.cf-rs-table th.name,
+.cf-roll-stats table.cf-rs-table td.name {
+  text-align: left;
+}
+
+.cf-roll-stats table.cf-rs-table .cf-rs-name {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 10rem;
+}
+
+.cf-roll-stats table.cf-rs-table .cf-rs-name span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cf-roll-stats table.cf-rs-table td.name img {
+  width: 22px;
+  height: 22px;
+  object-fit: cover;
+  border: none;
+  border-radius: 3px;
+}
+
+.cf-roll-stats table.cf-rs-table tbody tr:nth-child(odd) {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.cf-roll-stats table.cf-rs-table tbody tr:hover {
+  background: rgba(255, 200, 80, 0.18);
+}
+
+.cf-roll-stats table.cf-rs-table th.nat20,
+.cf-roll-stats table.cf-rs-table td.nat20 {
+  color: #1b5e20;
+}
+
+.cf-roll-stats table.cf-rs-table th.nat1,
+.cf-roll-stats table.cf-rs-table td.nat1 {
+  color: #9b1b1b;
+}
+
+.cf-roll-stats table.cf-rs-table td.best {
+  font-weight: 700;
+}
+
+.cf-roll-stats table.cf-rs-table small {
+  opacity: 0.7;
+}
+
+.cf-roll-stats .cf-rs-chart-section header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.cf-roll-stats .cf-rs-chart-section header h3 {
+  flex: 1;
+}
+
+.cf-roll-stats .cf-rs-chart-section header label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: var(--font-size-12, 12px);
+}
+
+.cf-roll-stats .cf-rs-chart {
+  display: grid;
+  grid-template-columns: repeat(20, minmax(0, 1fr));
+  gap: 0.2rem;
+  margin-top: 0.5rem;
+  padding: 0.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 0.4rem;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.cf-roll-stats .cf-rs-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  min-width: 0;
+  font-size: var(--font-size-11, 11px);
+}
+
+.cf-roll-stats .cf-rs-count {
+  font-variant-numeric: tabular-nums;
+}
+
+.cf-roll-stats .cf-rs-track {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  height: 150px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 2px;
+}
+
+.cf-roll-stats .cf-rs-track::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: var(--cf-expected, 0%);
+  border-top: 1px dashed rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+
+.cf-roll-stats .cf-rs-bar {
+  width: 100%;
+  min-height: 1px;
+  background: #4b6a8a;
+  border-radius: 2px 2px 0 0;
+  transition: height 200ms ease-out;
+}
+
+.cf-roll-stats .cf-rs-col.nat1 .cf-rs-bar {
+  background: #9b1b1b;
+}
+
+.cf-roll-stats .cf-rs-col.nat20 .cf-rs-bar {
+  background: #1b5e20;
+}
+
+.cf-roll-stats .cf-rs-face {
+  font-weight: 700;
+}
+
+.cf-roll-stats .cf-rs-chart-note,
+.cf-roll-stats .cf-rs-empty {
+  margin: 0.4rem 0 0;
+  font-size: var(--font-size-12, 12px);
+  opacity: 0.85;
 }
 
 /* Actor Settings tab */

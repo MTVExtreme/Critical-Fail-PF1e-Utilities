@@ -1,0 +1,180 @@
+<div class="cf-rs-root">
+<section class="cf-rs-filters">
+  <label>
+    <span>{{localize "CFUTIL.RollStats.Timeframe"}}</span>
+    <select data-filter="preset">
+      {{#each presets as |preset|}}
+        <option value="{{preset.value}}" {{#if preset.selected}}selected{{/if}}>{{preset.label}}</option>
+      {{/each}}
+    </select>
+  </label>
+  <label>
+    <span>{{localize "CFUTIL.RollStats.From"}}</span>
+    <input type="date" data-filter="from" value="{{filter.from}}" {{#unless customEnabled}}disabled{{/unless}}>
+  </label>
+  <label>
+    <span>{{localize "CFUTIL.RollStats.To"}}</span>
+    <input type="date" data-filter="to" value="{{filter.to}}" {{#unless customEnabled}}disabled{{/unless}}>
+  </label>
+  <label>
+    <span>{{localize "CFUTIL.RollStats.SpecificDate"}}</span>
+    <input type="date" data-filter="date" value="{{filter.date}}">
+  </label>
+  <label class="cf-rs-search">
+    <span>{{localize "CFUTIL.RollStats.Search"}}</span>
+    <input type="search" data-search value="{{search}}" placeholder="{{localize "CFUTIL.RollStats.SearchPlaceholder"}}" autocomplete="off">
+  </label>
+  <div class="cf-rs-actions">
+    <button type="button" data-action="refresh" data-tooltip="{{localize "CFUTIL.RollStats.Refresh"}}">
+      <i class="fa-solid fa-rotate" inert></i>
+    </button>
+    {{#if isGM}}
+      <button type="button" data-action="clear" data-tooltip="{{localize "CFUTIL.RollStats.Clear"}}">
+        <i class="fa-solid fa-trash" inert></i>
+      </button>
+    {{/if}}
+  </div>
+</section>
+
+<p class="cf-rs-range">
+  <strong>{{rangeLabel}}</strong> · {{localize "CFUTIL.RollStats.D20Count" count=totalD20}} · {{localize "CFUTIL.RollStats.PCCount" count=rowCount}}
+  <span class="cf-rs-search-count" data-search-count></span>
+  {{#unless trackingEnabled}}<span class="cf-rs-warning">{{localize "CFUTIL.RollStats.TrackingOff"}}</span>{{/unless}}
+  {{#unless activeGM}}<span class="cf-rs-warning">{{localize "CFUTIL.RollStats.NoGM"}}</span>{{/unless}}
+</p>
+
+<div class="cf-rs-scroll">
+  {{#if hasRows}}
+    <section class="cf-rs-comparison">
+      <div class="cf-rs-compare nat20">
+        <i class="fa-solid fa-trophy" inert></i>
+        <span>{{localize "CFUTIL.RollStats.Best20In10"}}</span>
+        <strong>{{#if comparison.best20.value}}{{comparison.best20.names}} ({{comparison.best20.value}}){{else}}—{{/if}}</strong>
+      </div>
+      <div class="cf-rs-compare nat1">
+        <i class="fa-solid fa-skull" inert></i>
+        <span>{{localize "CFUTIL.RollStats.Best1In10"}}</span>
+        <strong>{{#if comparison.best1.value}}{{comparison.best1.names}} ({{comparison.best1.value}}){{else}}—{{/if}}</strong>
+      </div>
+    </section>
+
+    <h3>{{localize "CFUTIL.RollStats.D20Header"}} <small>{{localize "CFUTIL.RollStats.SortHint"}}</small></h3>
+    <div class="cf-rs-table-wrap d20">
+      <table class="cf-rs-table">
+        <thead>
+          <tr>
+            {{#each d20Columns as |col|}}
+              <th class="{{col.cls}} sortable {{#if col.active}}active{{/if}}" data-sort-table="d20" data-sort-key="{{col.key}}" {{#if col.hint}}data-tooltip="{{col.hint}}"{{/if}}>
+                <span>{{col.label}}</span>{{#if col.active}}<i class="fa-solid {{#if col.desc}}fa-caret-down{{else}}fa-caret-up{{/if}}" inert></i>{{/if}}
+              </th>
+            {{/each}}
+          </tr>
+        </thead>
+        <tbody>
+          {{#each d20Rows as |row|}}
+            <tr data-search-name="{{row.searchName}}">
+              <td class="name">
+                <div class="cf-rs-name">
+                  <img src="{{row.img}}" alt="" loading="lazy">
+                  <span>{{row.name}}</span>
+                  {{#if row.missing}}<i class="fa-solid fa-ghost" data-tooltip="{{localize "CFUTIL.RollStats.MissingActor"}}" inert></i>{{/if}}
+                </div>
+              </td>
+              <td>{{row.d20.total}}</td>
+              <td class="nat20">{{row.d20.nat20}} <small>({{row.fmt.pct20}}%)</small></td>
+              <td class="nat1">{{row.d20.nat1}} <small>({{row.fmt.pct1}}%)</small></td>
+              <td>{{row.d20.streak20}}</td>
+              <td>{{row.d20.streak1}}</td>
+              <td class="{{#if row.isBest20}}best{{/if}}">{{row.d20.max20In10}}{{#if row.isBest20}} <i class="fa-solid fa-trophy" inert></i>{{/if}}</td>
+              <td class="{{#if row.isBest1}}best{{/if}}">{{row.d20.max1In10}}{{#if row.isBest1}} <i class="fa-solid fa-skull" inert></i>{{/if}}</td>
+              <td>{{row.fmt.average}}</td>
+            </tr>
+          {{/each}}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td class="name">{{localize "CFUTIL.RollStats.Totals" count=rowCount}}</td>
+            <td>{{totals.d20.total}}</td>
+            <td class="nat20">{{totals.d20.nat20}} <small>({{totals.d20.pct20}}%)</small></td>
+            <td class="nat1">{{totals.d20.nat1}} <small>({{totals.d20.pct1}}%)</small></td>
+            <td>{{totals.d20.streak20}}</td>
+            <td>{{totals.d20.streak1}}</td>
+            <td>{{totals.d20.max20In10}}</td>
+            <td>{{totals.d20.max1In10}}</td>
+            <td>{{totals.d20.average}}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <h3>{{localize "CFUTIL.RollStats.DamageHeader"}} <small>{{localize "CFUTIL.RollStats.SortHint"}}</small></h3>
+    <div class="cf-rs-table-wrap damage">
+      <table class="cf-rs-table">
+        <thead>
+          <tr>
+            {{#each damageColumns as |col|}}
+              <th class="{{col.cls}} sortable {{#if col.active}}active{{/if}}" data-sort-table="damage" data-sort-key="{{col.key}}" {{#if col.hint}}data-tooltip="{{col.hint}}"{{/if}}>
+                <span>{{col.label}}</span>{{#if col.active}}<i class="fa-solid {{#if col.desc}}fa-caret-down{{else}}fa-caret-up{{/if}}" inert></i>{{/if}}
+              </th>
+            {{/each}}
+          </tr>
+        </thead>
+        <tbody>
+          {{#each damageRows as |row|}}
+            <tr data-search-name="{{row.searchName}}">
+              <td class="name"><div class="cf-rs-name"><img src="{{row.img}}" alt="" loading="lazy"><span>{{row.name}}</span></div></td>
+              <td>{{row.damage.count}}</td>
+              <td>{{row.damage.total}}</td>
+              <td>{{row.damage.max}}</td>
+              <td>{{row.fmt.damageAverage}}</td>
+              <td>{{row.healing.count}}</td>
+              <td>{{row.healing.total}}</td>
+              <td>{{row.healing.max}}</td>
+              <td>{{row.fmt.healingAverage}}</td>
+            </tr>
+          {{/each}}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td class="name">{{localize "CFUTIL.RollStats.Totals" count=rowCount}}</td>
+            <td>{{totals.damage.count}}</td>
+            <td>{{totals.damage.total}}</td>
+            <td>{{totals.damage.max}}</td>
+            <td>{{totals.damage.average}}</td>
+            <td>{{totals.healing.count}}</td>
+            <td>{{totals.healing.total}}</td>
+            <td>{{totals.healing.max}}</td>
+            <td>{{totals.healing.average}}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <section class="cf-rs-chart-section">
+      <header>
+        <h3>{{localize "CFUTIL.RollStats.ChartHeader"}} — {{chartTitle}}</h3>
+        <label>
+          <span>{{localize "CFUTIL.RollStats.ChartFor"}}</span>
+          <select data-filter="chartActor">
+            {{#each chartActors as |option|}}
+              <option value="{{option.value}}" {{#if option.selected}}selected{{/if}}>{{option.label}}</option>
+            {{/each}}
+          </select>
+        </label>
+      </header>
+      <div class="cf-rs-chart" style="--cf-expected: {{chart.expectedPct}}%">
+        {{#each chart.bars as |bar|}}
+          <div class="cf-rs-col {{bar.cls}}" data-tooltip="{{bar.tooltip}}">
+            <span class="cf-rs-count">{{bar.count}}</span>
+            <div class="cf-rs-track"><div class="cf-rs-bar" style="height: {{bar.heightPct}}%"></div></div>
+            <span class="cf-rs-face">{{bar.face}}</span>
+          </div>
+        {{/each}}
+      </div>
+      <p class="cf-rs-chart-note">{{localize "CFUTIL.RollStats.ChartNote" total=chart.total expected=chart.expected}}</p>
+    </section>
+  {{else}}
+    <p class="cf-rs-empty">{{localize "CFUTIL.RollStats.Empty"}}</p>
+  {{/if}}
+</div>
+</div>
