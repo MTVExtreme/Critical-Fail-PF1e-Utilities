@@ -33,6 +33,14 @@ export function registerSettings() {
     type: new foundry.data.fields.BooleanField({ initial: true }),
   });
 
+  game.settings.register(MODULE_ID, "enableMananiteAmmo", {
+    name: "CFUTIL.Settings.enableMananiteAmmo",
+    hint: "CFUTIL.Settings.enableMananiteAmmoHint",
+    scope: "world",
+    config: true,
+    type: new foundry.data.fields.BooleanField({ initial: true }),
+  });
+
   game.settings.register(MODULE_ID, "enableRollTracking", {
     name: "CFUTIL.Settings.enableRollTracking",
     hint: "CFUTIL.Settings.enableRollTrackingHint",
@@ -52,6 +60,10 @@ export function registerSettings() {
 
 export function isGuileTabEnabled() {
   return game.settings.get(MODULE_ID, "enableGuileTab") === true;
+}
+
+export function isMananiteEnabled() {
+  return game.settings.get(MODULE_ID, "enableMananiteAmmo") !== false;
 }
 
 export function isRollTrackingEnabled() {

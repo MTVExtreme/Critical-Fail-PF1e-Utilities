@@ -51,6 +51,7 @@ export const GUILE_WIKI_SLUGS = {
   subterfuge: "subterfuge",
   survivalism: "survivalism",
   vocation: "vocation",
+  occultism: "occultism",
 };
 
 export const DICE_MODES = {
