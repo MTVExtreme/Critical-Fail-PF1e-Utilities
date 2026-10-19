@@ -3,6 +3,7 @@ import { api as surgeApi } from "./features/surge/index.mjs";
 import { api as guileApi } from "./features/guile/index.mjs";
 import { api as rollStatsApi } from "./features/rollstats/index.mjs";
 import { api as mananiteApi } from "./features/mananite/index.mjs";
+import { api as astralApi } from "./features/astral/index.mjs";
 
 export function registerApi() {
   const mod = game.modules.get(MODULE_ID);
@@ -15,5 +16,6 @@ export function registerApi() {
     guile: guileApi,
     rollStats: rollStatsApi,
     mananite: mananiteApi,
+    astral: astralApi,
   };
 }

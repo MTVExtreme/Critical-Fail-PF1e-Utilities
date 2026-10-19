@@ -1,8 +1,10 @@
 import { MODULE_ID } from "../../constants.mjs";
 import { isMananiteEnabled } from "../../settings.mjs";
 import { scaledMananiteFormula } from "./damage.mjs";
+import { renderMananitePicker } from "./dialog.mjs";
 
 const AMMO_TYPE = "mananite";
+const ABILITIES = ["str", "dex", "con", "int", "wis", "cha"];
 
 /** The action use currently being resolved on this client. */
 let activeUse = null;
@@ -21,9 +23,161 @@ function crystalData(item) {
   return item?.getFlag?.(MODULE_ID, "mananiteCharge") ?? null;
 }
 
+function gunKind(item) {
+  return gunData(item)?.kind || item?.getFlag?.("critical-fail-shared", "mananite") || "";
+}
+
 function chargesOf(item) {
-  const value = Number(item?.system?.uses?.value);
-  return Number.isFinite(value) ? value : 0;
+  const uses = item?.system?.uses;
+  if (uses?.per === "charges") {
+    const value = Number(uses.value);
+    return Number.isFinite(value) ? value : 0;
+  }
+  const quantity = Number(item?.system?.quantity);
+  return Number.isFinite(quantity) ? quantity : 0;
+}
+
+function rejectShot(use, index, parts) {
+  parts[0].base = "0";
+  const attack = use.shared?.attacks?.[index];
+  if (attack) attack.ammo = null;
+}
+
+function isSupercombine(action) {
+  return action?.hasAttack === false || action?.actionType === "save" || action?.name === "Supercombine";
+}
+
+function stageRank(stage) {
+  const match = String(stage ?? "").match(/(\d+)/);
+  return match ? Number(match[1]) : 0;
+}
+
+function formulaPlus(base, extra) {
+  if (!extra) return base || "";
+  if (!base) return extra;
+  return `(${base}) + (${extra})`;
+}
+
+function copyAttack(attack, label, extraPenalty) {
+  const copy = {
+    type: attack.type ?? null,
+    label,
+    attackBonus: formulaPlus(attack.attackBonus, extraPenalty),
+    abstract: !!attack.abstract,
+    ammo: attack.ammo ? { ...attack.ammo } : null,
+    chargeCost: attack.chargeCost ?? null,
+    chatAttack: null
+  };
+  Object.defineProperty(copy, "hasAmmo", { get() { return !!this.ammo; } });
+  return copy;
+}
+
+function expandBursts(attacks) {
+  const expanded = [];
+  for (const attack of attacks) {
+    for (let round = 1; round <= 3; round += 1) {
+      expanded.push(copyAttack(attack, `${attack.label} (round ${round})`, ""));
+    }
+  }
+  return expanded;
+}
+
+function applySemiPenalty(use) {
+  if (!use.shared?.fullAttack) return;
+  const rapid = (use.shared.attacks ?? []).some((attack) => attack.type === "rapid-shot")
+    || !!use.formData?.["rapid-shot"]
+    || !!use.shared.formData?.["rapid-shot"];
+  const penalty = rapid ? "-4" : "-2";
+  for (const attack of use.shared.attacks ?? []) {
+    attack.attackBonus = formulaPlus(attack.attackBonus, penalty);
+  }
+}
+
+function keepSingleShot(use) {
+  const attacks = use.shared?.attacks ?? [];
+  const first = attacks.find((attack) => !["haste-attack", "rapid-shot", "manyshot"].includes(attack.type)) ?? attacks[0];
+  if (first) use.shared.attacks = [first];
+}
+
+function ensureCrystals(use) {
+  const fallback = use.item?.getFlag?.(MODULE_ID, "loadedCrystal");
+  if (!fallback) return;
+  for (const attack of use.shared?.attacks ?? []) {
+    if (!attack.ammo?.id) attack.ammo = { id: fallback };
+  }
+}
+
+function stripDeadlyAim(use) {
+  const labels = ["PF1.DeadlyAim", "PF1.PowerAttack"].map((key) => game.i18n.localize(key));
+  if (Array.isArray(use.shared?.attackBonus)) {
+    use.shared.attackBonus = use.shared.attackBonus.filter((part) => !labels.some((label) => String(part).includes(`[${label}]`)));
+  }
+  const rollData = use.shared?.rollData;
+  if (rollData) {
+    rollData.powerAttackBonus = 0;
+    rollData.powerAttackPenalty = 0;
+  }
+  if (use.shared) use.shared.powerAttack = false;
+}
+
+function attachFiringMode(use) {
+  const gun = gunData(use.item);
+  if (!gun || use._cfMananiteFiring) return;
+  const actionId = use.action?.id ?? use.action?._id;
+  const profile = gun.actions?.[actionId];
+  use._cfMananiteFiring = true;
+  const original = use.generateChatAttacks.bind(use);
+  use.generateChatAttacks = async function generateMananiteAttacks() {
+    try {
+      if (profile?.solo) keepSingleShot(this);
+      if (profile?.semi && !this._cfSemiApplied) {
+        applySemiPenalty(this);
+        this._cfSemiApplied = true;
+      }
+      if (profile?.burst && !this._cfBurstExpanded) {
+        this.shared.attacks = expandBursts(this.shared.attacks ?? []);
+        this._cfBurstExpanded = true;
+      }
+      ensureCrystals(this);
+      if (gunKind(this.item) === "caster-gun") stripDeadlyAim(this);
+    } catch (error) {
+      console.error(`${MODULE_ID} | Mananite firing`, error);
+    }
+    return original();
+  };
+}
+
+function casterAbility(actor) {
+  const books = actor?.system?.attributes?.spells?.spellbooks ?? {};
+  let best = null;
+  for (const book of Object.values(books)) {
+    if (!book?.inUse) continue;
+    const key = book.ability;
+    if (!ABILITIES.includes(key)) continue;
+    const mod = Number(actor.system?.abilities?.[key]?.mod);
+    if (!Number.isFinite(mod)) continue;
+    if (!best || mod > best.mod) best = { key, mod };
+  }
+  return best?.key ?? "";
+}
+
+function applyDamageAbility(action, rollData) {
+  const kind = gunKind(action.item);
+  if (!kind || !rollData) return;
+  rollData.action ??= {};
+  rollData.action.ability ??= {};
+  if (kind === "shardcaster") {
+    rollData.action.ability.damage = "";
+    return;
+  }
+  if (kind !== "caster-gun") return;
+  const ability = casterAbility(action.item?.actor);
+  rollData.action.ability.damage = ability;
+  if (ability) rollData.ablMult = 1;
+}
+
+function releaseAmmo(use) {
+  for (const attack of use.shared?.attacks ?? []) attack.ammo = null;
 }
 
 function warnOnce(use, key, message) {
@@ -58,14 +212,15 @@ function applyLoadedCrystal(action, rollData, parts) {
   }
 
   const reject = (key, message) => {
-    parts[0].base = "0";
+    rejectShot(activeUse, index, parts);
+    if (rollData.action?.ability) rollData.action.ability.damage = "";
     if (!isCritDamage) {
       activeUse._cfMananiteRejected.add(index);
       warnOnce(activeUse, key, message);
     }
   };
 
-  if (!crystal || crystal.system?.extraType !== AMMO_TYPE || !charge) {
+  if (!crystal || !charge) {
     reject("missing", game.i18n.localize("CFUTIL.Mananite.LoadCrystal"));
     return;
   }
@@ -76,32 +231,44 @@ function applyLoadedCrystal(action, rollData, parts) {
     );
     return;
   }
+  if (profile.automatic && stageRank(charge.stage) < 3) {
+    reject(
+      "automatic",
+      game.i18n.format("CFUTIL.Mananite.AutomaticStage", { stage: charge.stage || "Unrefined" })
+    );
+    releaseAmmo(activeUse);
+    return;
+  }
 
   parts[0].base = scaledMananiteFormula(parts[0].base, { ...profile, sides: charge.sides });
+  applyDamageAbility(action, rollData);
+  if (isSupercombine(action)) {
+    releaseAmmo(activeUse);
+    return;
+  }
   if (isCritDamage) return;
 
   const draw = Number(profile.draw) || 0;
-  activeUse._cfMananiteSpend ??= [];
-  const spent = activeUse._cfMananiteSpend
+  if (draw <= 0) return;
+  activeUse._cfChargeSpend ??= [];
+  const spent = activeUse._cfChargeSpend
     .filter((entry) => entry.crystalId === crystal.id)
     .reduce((total, entry) => total + entry.draw, 0);
   if (chargesOf(crystal) < spent + draw) {
-    parts[0].base = "0";
-    activeUse._cfMananiteRejected.add(index);
-    warnOnce(activeUse, `charges:${crystal.id}`, game.i18n.format("CFUTIL.Mananite.NotEnough", { name: crystal.name }));
+    reject(`charges:${crystal.id}`, game.i18n.format("CFUTIL.Mananite.NotEnough", { name: crystal.name }));
     return;
   }
-  activeUse._cfMananiteSpend.push({ crystalId: crystal.id, draw });
+  activeUse._cfChargeSpend.push({ crystalId: crystal.id, draw });
 }
 
-async function spendCommittedCharges(use) {
-  const entries = use._cfMananiteSpend ?? [];
+async function spendCrystalCharges(use) {
+  const entries = use._cfChargeSpend ?? [];
   if (!entries.length) return;
   const totals = new Map();
   for (const entry of entries) totals.set(entry.crystalId, (totals.get(entry.crystalId) ?? 0) + entry.draw);
   for (const [crystalId, draw] of totals) {
     const crystal = use.actor?.items?.get(crystalId);
-    if (!crystal || draw <= 0) continue;
+    if (!crystal) continue;
     const remaining = Math.max(0, chargesOf(crystal) - draw);
     await crystal.update({ "system.uses.value": remaining });
     ui.notifications.info(game.i18n.format("CFUTIL.Mananite.Spent", {
@@ -112,27 +279,11 @@ async function spendCommittedCharges(use) {
   }
 }
 
-function labelMananiteAmmo(app, html) {
-  const root = html instanceof HTMLElement ? html : html?.[0];
-  const actor = app?.actionUse?.actor ?? app?.actionUse?.item?.actor;
-  if (!root || !actor) return;
-  for (const row of root.querySelectorAll(".ammo-item[data-id]")) {
-    const item = actor.items.get(row.dataset.id);
-    const charge = crystalData(item);
-    if (!charge) continue;
-    const label = row.querySelector("span");
-    if (!label) continue;
-    label.textContent = game.i18n.format("CFUTIL.Mananite.AmmoLabel", {
-      name: item.name,
-      charges: chargesOf(item)
-    });
-  }
-}
-
 export function registerMananiteHooks() {
   Hooks.on("pf1CreateActionUse", (use) => {
     if (!gunData(use.item)) return;
     activeUse = use;
+    attachFiringMode(use);
   });
 
   Hooks.on("pf1PreDamageRoll", (action, rollData, parts) => {
@@ -145,14 +296,14 @@ export function registerMananiteHooks() {
 
   Hooks.on("pf1PreActionUse", (use) => {
     if (use !== activeUse) return;
+    releaseAmmo(use);
     activeUse = null;
-    if (!isMananiteEnabled()) return;
-    spendCommittedCharges(use).catch((error) => console.error(`${MODULE_ID} | Mananite charges`, error));
+    spendCrystalCharges(use).catch((error) => console.error(`${MODULE_ID} | Mananite charges`, error));
   });
 
   Hooks.on("renderAttackDialog", (app, html) => {
     try {
-      labelMananiteAmmo(app, html);
+      renderMananitePicker(app, html);
     } catch (error) {
       console.error(`${MODULE_ID} | Mananite ammo list`, error);
     }

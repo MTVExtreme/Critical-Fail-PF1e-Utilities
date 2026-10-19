@@ -35,6 +35,19 @@ Module id: `critical-fail-pf1e-utilities`
 - Module setting **Record PC roll statistics**; the popup has a **Clear all recorded data** button
 - API: `game.modules.get("critical-fail-pf1e-utilities").api.rollStats` (`open`, `getData`, `clear`, `flush`)
 
+### Astral energy shield
+- The sheet Settings tab has **Show shield beside hit points**, off unless you turn it on for that actor. While it is on, a **Shield** box sits beside hit points. Set a maximum to turn the pool on. Hovering the box lists the raw shield values the same way hit points do. By default that pool is lost before hit points and temporary hit points. **Take Temp HP first**, beside that switch and off by default, loses temporary hit points before the shield. The token hit-point buttons use that same order, and the shield is drawn as the blue top half of the token bar.
+- **Show burn beside nonlethal** adds a Burn box to the right of Nonlethal. The number is hit points of burn, kept separate from Nonlethal. If the two together are higher than current hit points, the creature falls unconscious. A rest that restores health clears burn. Burn is purple on the token bar, beside nonlethal, and in the hit-point hover tip.
+- Shield changes float over the token and, when Koboldworks Health Monitor is enabled, appear in its log. Healing is light blue and damage is dark blue. Burn uses the same log: light purple when burn is removed, dark purple when burn is taken.
+- For the sphinx, resistances apply before the shield. Damage reduction applies only to physical damage that gets past it.
+- Fire and electricity never injure it. Electricity heals 1 body hit point per 3 points and then spills into the shield. Both grant haste for 3 rounds, refreshed rather than stacked. Fire also ends a slow effect.
+- An EMP damage type, or the sphinx's **Trigger EMP** action, drops the field for one round without erasing its hit points, heals 20, and grants haste.
+- Hostile spells that allow spell resistance are reflected (or turned back on the caster, for an area) instead of touching the shield. Fire and electricity spells trigger the energy response instead of reflecting.
+- While the field has hit points, new harmful conditions, curses, ability damage, ability drain, and negative levels are refused. Mind-affecting effects can land while the field is down.
+- At the start of its turn the primary GM client restores 10 body hit points (unless evil damage suppressed regeneration) and 10 shield hit points.
+- The sphinx's **Guardian Controls** item runs EMP, interception, size changes, archive injunction, core removal, and spell reflection.
+- If the Boss Bar module is showing that actor, a cyan hexagonal forcefield covers the bar in proportion to shield integrity. Players see the field only. The shield total is on the sheet, and on the bar for the GM.
+
 ## Documentation
 
 - [AGENTS.md](../AGENTS.md)

@@ -511,3 +511,292 @@
 .chat-message .cf-surge-die.kept {
   font-weight: 700;
 }
+
+/* Attack dialog: Mananite names are long, and the charge menu has to paint past the window. */
+.pf1.attack-dialog.cf-mananite-ammo {
+  min-width: 46rem;
+}
+
+.pf1.attack-dialog.cf-mananite-ammo .attacks :is(.attack, .attack-header) .ammo {
+  flex: 1 0 28rem;
+  max-width: none;
+}
+
+.pf1.attack-dialog .cf-crystal-select {
+  position: relative;
+  background: var(--pf1-bg-dark-0);
+  border: 1px solid var(--pf1-tan);
+  border-radius: 3px;
+  width: 100%;
+  height: 26px;
+}
+
+.pf1.attack-dialog .cf-crystal-select .cf-crystal-current {
+  align-items: center;
+  height: 26px;
+  cursor: pointer;
+  gap: 3px;
+}
+
+.pf1.attack-dialog .cf-crystal-select img {
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  border: none;
+}
+
+.pf1.attack-dialog .cf-crystal-select .cf-crystal-current span {
+  overflow: visible;
+  text-overflow: unset;
+  white-space: nowrap;
+  line-height: 26px;
+}
+
+.pf1.attack-dialog .cf-crystal-select .fa-chevron-down {
+  flex: 0 0 12px;
+  margin-left: auto;
+}
+
+.pf1.attack-dialog .cf-crystal-select ul {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 1000;
+  width: max-content;
+  min-width: 100%;
+  max-height: 250px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+  background-color: #f1efe4;
+  background-image: url("../../../ui/parchment.jpg");
+  background-repeat: repeat;
+  border: 1px solid var(--color-border-light-tertiary);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+}
+
+.pf1.attack-dialog .cf-crystal-select ul.open {
+  display: block;
+}
+
+.pf1.attack-dialog .cf-crystal-select li {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  min-height: 25px;
+  padding-right: 4px;
+  white-space: nowrap;
+  cursor: pointer;
+  background-color: #f1efe4;
+  background-image: url("../../../ui/parchment.jpg");
+  background-repeat: repeat;
+}
+
+.pf1.attack-dialog .cf-crystal-select li.current {
+  color: blue;
+  font-weight: bold;
+}
+
+.pf1.attack-dialog .cf-crystal-select li:hover {
+  background-color: #e6dcc0;
+  background-image: none;
+}
+
+.pf1.attack-dialog .cf-crystal-select .controls {
+  display: none;
+  margin-left: auto;
+}
+
+.pf1.attack-dialog .cf-crystal-select li:hover .controls {
+  display: flex;
+}
+
+.pf1.attack-dialog .cf-crystal-select .controls a {
+  flex: 0 0 16px;
+  text-align: center;
+}
+
+.pf1.attack-dialog.cf-mananite-ammo:has(.cf-crystal-select ul.open),
+.pf1.attack-dialog.cf-mananite-ammo:has(.cf-crystal-select ul.open) .window-content,
+.pf1.attack-dialog.cf-mananite-ammo:has(.cf-crystal-select ul.open) form,
+.pf1.attack-dialog.cf-mananite-ammo:has(.cf-crystal-select ul.open) .attacks,
+.pf1.attack-dialog.cf-mananite-ammo:has(.cf-crystal-select ul.open) .attack {
+  overflow: visible !important;
+}
+
+/* Astral energy shield, drawn over the Boss Bar health bar. */
+#boss-bar .boss-bar-container {
+  position: relative;
+}
+
+#boss-bar .cf-astral-shield {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+#boss-bar .cf-astral-field {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--shield-percent);
+  background-color: rgba(18, 126, 214, 0.22);
+  background-image:
+    linear-gradient(30deg, rgba(214, 251, 255, 0.72) 1px, transparent 1px),
+    linear-gradient(150deg, rgba(214, 251, 255, 0.55) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(120, 214, 255, 0.28) 1px, transparent 1px);
+  background-size: 18px 32px, 18px 32px, 18px 32px;
+  box-shadow:
+    inset 0 0 14px rgba(150, 236, 255, 0.95),
+    inset 0 0 2px rgba(255, 255, 255, 0.8),
+    0 0 12px rgba(40, 180, 255, 0.75);
+  border-right: 2px solid rgba(230, 253, 255, 0.95);
+  animation: cf-astral-flow 2.8s linear infinite;
+}
+
+.pf1.sheet.actor .tab.summary .attributes .health-details.cf-energy-shield {
+  flex: 2 1 0;
+  min-width: 0;
+}
+
+.pf1.sheet.actor .cf-energy-shield .info-box,
+.pf1.sheet.actor .cf-energy-shield .info-box-joined,
+.pf1.sheet.actor .cf-energy-shield .value,
+.pf1.sheet.actor .cf-energy-shield input {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.pf1.sheet.actor .cf-energy-shield .info-box > h5 {
+  flex: 0 0 auto;
+  overflow: visible;
+  min-height: 1.4em;
+}
+
+.cf-shield-actor-settings .cf-shield-toggles {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 0.75rem 1.5rem;
+  align-items: flex-start;
+}
+
+.cf-shield-actor-settings .cf-shield-toggles .form-group {
+  flex: 1 1 14rem;
+  margin: 0;
+}
+
+.pf1.sheet.actor .cf-energy-shield > h3 {
+  color: #7ed8ff;
+}
+
+.pf1.sheet.actor .cf-energy-shield input,
+.pf1.sheet.actor .cf-burn input {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  -moz-appearance: textfield;
+}
+
+.pf1.sheet.actor .cf-energy-shield input::-webkit-outer-spin-button,
+.pf1.sheet.actor .cf-energy-shield input::-webkit-inner-spin-button,
+.pf1.sheet.actor .cf-burn input::-webkit-outer-spin-button,
+.pf1.sheet.actor .cf-burn input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.pf1.sheet.actor .cf-energy-shield input:focus {
+  outline: 1px solid rgba(126, 216, 255, 0.8);
+}
+
+#chat .chat-message.koboldworks.health-monitor.cf-shield-feedback.healing {
+  background-color: #3aa0e6;
+  border-color: #d7f1ff;
+}
+
+#chat .chat-message.koboldworks.health-monitor.cf-shield-feedback.healing.whisper {
+  background-color: #2a6f99;
+  border-color: #b7e4ff;
+}
+
+#chat .chat-message.koboldworks.health-monitor.cf-shield-feedback.damage {
+  background-color: #0c2748;
+  border-color: #1c4f86;
+}
+
+#chat .chat-message.koboldworks.health-monitor.cf-shield-feedback.damage.whisper {
+  background-color: #163556;
+  border-color: #3d6ea8;
+}
+
+#chat .chat-message.koboldworks.health-monitor.cf-burn-feedback.healing {
+  background-color: #c084fc;
+  border-color: #f3e8ff;
+}
+
+#chat .chat-message.koboldworks.health-monitor.cf-burn-feedback.healing.whisper {
+  background-color: #a855f7;
+  border-color: #e9d5ff;
+}
+
+#chat .chat-message.koboldworks.health-monitor.cf-burn-feedback.damage {
+  background-color: #3b0764;
+  border-color: #6b21a8;
+}
+
+#chat .chat-message.koboldworks.health-monitor.cf-burn-feedback.damage.whisper {
+  background-color: #4c1d95;
+  border-color: #7e22ce;
+}
+
+#boss-bar .cf-astral-readout {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: right;
+  color: #e9fbff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow: 0 0 6px #04324d, 0 0 2px #000;
+  font-variant-numeric: tabular-nums;
+}
+
+#boss-bar .cf-astral-shield.collapsed .cf-astral-field {
+  width: 100%;
+  opacity: 0.28;
+  background-color: transparent;
+  animation: cf-astral-flicker 1.1s steps(2, end) infinite;
+  box-shadow: inset 0 0 0 1px rgba(140, 210, 230, 0.45);
+}
+
+#boss-bar .cf-astral-shield.suppressed .cf-astral-field {
+  width: 100%;
+  opacity: 0.15;
+  filter: saturate(0.2);
+  animation: cf-astral-flicker 0.18s steps(2, end) infinite;
+}
+
+@keyframes cf-astral-flow {
+  from { background-position: 0 0, 0 0, 0 0; }
+  to { background-position: 18px 32px, -18px 32px, 0 32px; }
+}
+
+@keyframes cf-astral-flicker {
+  50% { opacity: 0.05; }
+}
