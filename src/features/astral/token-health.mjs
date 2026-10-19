@@ -12,12 +12,39 @@ function writeChange(update, path, value) {
   foundry.utils.setProperty(update, path, value);
 }
 
+const pendingDirect = new WeakMap();
+
+/** Shift-committed sheet edit that must stay on the box that was changed. */
+export function markDirectPool(actor, pool) {
+  if (!actor || !pool) return;
+  pendingDirect.set(actor, { pool, at: Date.now() });
+}
+
+function isDirectSheetEdit(actor, update) {
+  const mark = pendingDirect.get(actor);
+  if (!mark) return false;
+  if (Date.now() - mark.at > 2000) {
+    pendingDirect.delete(actor);
+    return false;
+  }
+  const value = readChange(update, "system.attributes.hp.value");
+  const offset = readChange(update, "system.attributes.hp.offset");
+  const temp = readChange(update, "system.attributes.hp.temp");
+  const hpTouched = value != null || offset != null;
+  const tempTouched = temp != null;
+  const match = (mark.pool === "hp" && hpTouched && !tempTouched)
+    || (mark.pool === "temp" && tempTouched && !hpTouched);
+  if (match) pendingDirect.delete(actor);
+  return match;
+}
+
 /**
  * Sheet edits and other direct hit-point updates.
  * PF1 turns `hp.value` into `hp.offset` before this hook runs, so both shapes count.
  * The token bar update already carries the shield and is not spent twice.
  */
 export function absorbDirectHealth(actor, update, shield, { staged = false, options } = {}) {
+  if (options?.cfutilDirectHp || isDirectSheetEdit(actor, update)) return shield;
   if (staged || !shieldAbsorbing(shield)) return shield;
   if (readChange(update, `flags.${MODULE_ID}.energyShield`)) return shield;
   const hp = actor.system?.attributes?.hp;
@@ -102,9 +129,16 @@ function wrapPrototype(prototype) {
     if (attribute !== "attributes.hp" || !isAstralEnabled()) return original.call(this, attribute, value, isDelta, isBar);
     const shield = getShield(this);
     const hp = this.system?.attributes?.hp;
-    if (!hp || !shieldAbsorbing(shield)) return original.call(this, attribute, value, isDelta, isBar);
+    if (!hp) return original.call(this, attribute, value, isDelta, isBar);
     let delta = Number(value) || 0;
     if (!isDelta) delta = delta - ((hp.temp || 0) + (hp.value || 0));
+    if (delta < 0 && game.keyboard?.isModifierActive?.("SHIFT")) {
+      const max = Number(hp.max) || 0;
+      return this.update({
+        "system.attributes.hp.offset": (hp.value || 0) + delta - max,
+      }, { cfutilDirectHp: true });
+    }
+    if (!shieldAbsorbing(shield)) return original.call(this, attribute, value, isDelta, isBar);
     if (delta >= 0) return original.call(this, attribute, value, isDelta, isBar);
     const next = spendShield(shield, hp, -delta);
     const max = Number(hp.max) || 0;

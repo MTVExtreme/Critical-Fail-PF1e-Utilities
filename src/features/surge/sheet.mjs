@@ -105,8 +105,11 @@ function injectActorSettings(app, root) {
     </div>
   `;
 
+  const burn = settingsTab.querySelector(".cf-burn-actor-settings");
+  const shield = settingsTab.querySelector(".cf-shield-actor-settings");
   const misc = settingsTab.querySelector(".misc-settings");
-  if (misc) misc.after(section);
+  const anchor = burn || shield || misc;
+  if (anchor) anchor.after(section);
   else settingsTab.append(section);
 }
 

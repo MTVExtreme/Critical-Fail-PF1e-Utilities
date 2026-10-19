@@ -1,4 +1,5 @@
 import { registerAstralHooks } from "./hooks.mjs";
+import { registerPoolChanges } from "./changes.mjs";
 import { registerTokenHealth } from "./token-health.mjs";
 import { advanceShieldTurn, triggerEmp } from "./actions.mjs";
 import { registerShieldSocket } from "./feedback.mjs";
@@ -7,6 +8,7 @@ import { getShield, setShieldPoints, setShieldShown, setShieldTempFirst } from "
 export function init() {}
 
 export function pf1PostInit() {
+  registerPoolChanges();
   registerAstralHooks();
 }
 

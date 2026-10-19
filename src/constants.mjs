@@ -11,6 +11,8 @@ export const CHANGE_TARGETS = {
   base: "cfSurgeBase",
   perLevel: "cfSurgePerLevel",
   perCL: "cfSurgePerCL",
+  shieldMax: "cfShieldMax",
+  burn: "cfBurn",
 };
 
 /** Actor flag: normal | kh | kl */

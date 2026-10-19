@@ -240,7 +240,7 @@ export function registerAstralHooks() {
   Hooks.on("updateActor", (actor, data, options, userId) => {
     announceShieldChange(actor, data, options, userId);
     const changed = data.flags?.[MODULE_ID]?.energyShield || data.flags?.[MODULE_ID]?.burn
-      || data.system?.attributes?.hp;
+      || data.system?.attributes?.hp || data.items;
     if (changed) refreshTokenBars(actor);
     if (game.user.id === userId) {
       syncBurnUnconscious(actor).catch((error) => console.error(`${MODULE_ID} | Burn unconscious`, error));

@@ -469,7 +469,9 @@
 }
 
 /* Actor Settings tab */
-.tab.settings .cf-surge-actor-settings {
+.tab.settings .cf-surge-actor-settings,
+.tab.settings .cf-shield-actor-settings,
+.tab.settings .cf-burn-actor-settings {
   margin-top: 0.75rem;
 }
 
