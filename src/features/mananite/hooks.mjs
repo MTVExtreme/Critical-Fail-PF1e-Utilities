@@ -58,17 +58,41 @@ function formulaPlus(base, extra) {
   return `(${base}) + (${extra})`;
 }
 
+function addAttackPenalty(attack, formula, flavor) {
+  const value = flavor ? `${formula}[${flavor}]` : formula;
+  if (Array.isArray(attack.bonuses)) {
+    attack.bonuses.push({ formula, flavor, value });
+    return;
+  }
+  attack.attackBonus = formulaPlus(attack.attackBonus, formula);
+}
+
 function copyAttack(attack, label, extraPenalty) {
+  const bonuses = Array.isArray(attack.bonuses) ? attack.bonuses.map((bonus) => ({ ...bonus })) : null;
   const copy = {
     type: attack.type ?? null,
     label,
-    attackBonus: formulaPlus(attack.attackBonus, extraPenalty),
     abstract: !!attack.abstract,
     ammo: attack.ammo ? { ...attack.ammo } : null,
     chargeCost: attack.chargeCost ?? null,
-    chatAttack: null
+    chatAttack: null,
+    rollData: attack.rollData ? { ...attack.rollData } : undefined,
   };
+  if (bonuses) {
+    copy.bonuses = bonuses;
+    Object.defineProperty(copy, "activeBonuses", {
+      get() {
+        return this.bonuses
+          .filter((bonus) => bonus.value != null && bonus.value !== "")
+          .map((bonus) => bonus.value);
+      },
+    });
+  }
+  else {
+    copy.attackBonus = formulaPlus(attack.attackBonus, extraPenalty);
+  }
   Object.defineProperty(copy, "hasAmmo", { get() { return !!this.ammo; } });
+  if (bonuses && extraPenalty) addAttackPenalty(copy, extraPenalty, "Burst");
   return copy;
 }
 
@@ -84,18 +108,19 @@ function expandBursts(attacks) {
 
 function applySemiPenalty(use) {
   if (!use.shared?.fullAttack) return;
-  const rapid = (use.shared.attacks ?? []).some((attack) => attack.type === "rapid-shot")
-    || !!use.formData?.["rapid-shot"]
-    || !!use.shared.formData?.["rapid-shot"];
+  const config = use.shared.config ?? use.shared.formData ?? use.formData ?? {};
+  const rapid = (use.shared.attacks ?? []).some((attack) => attack.type === "rapidShot" || attack.type === "rapid-shot")
+    || !!config.rapidShot
+    || !!config["rapid-shot"];
   const penalty = rapid ? "-4" : "-2";
   for (const attack of use.shared.attacks ?? []) {
-    attack.attackBonus = formulaPlus(attack.attackBonus, penalty);
+    addAttackPenalty(attack, penalty, "Semi-automatic");
   }
 }
 
 function keepSingleShot(use) {
   const attacks = use.shared?.attacks ?? [];
-  const first = attacks.find((attack) => !["haste-attack", "rapid-shot", "manyshot"].includes(attack.type)) ?? attacks[0];
+  const first = attacks.find((attack) => !["haste", "haste-attack", "rapidShot", "rapid-shot", "manyshot"].includes(attack.type)) ?? attacks[0];
   if (first) use.shared.attacks = [first];
 }
 
@@ -148,11 +173,10 @@ function attachFiringMode(use) {
 }
 
 function casterAbility(actor) {
-  const books = actor?.system?.attributes?.spells?.spellbooks ?? {};
+  const books = actor?.system?.spells ?? {};
   let best = null;
   for (const book of Object.values(books)) {
-    if (!book?.inUse) continue;
-    const key = book.ability;
+    const key = book?.ability;
     if (!ABILITIES.includes(key)) continue;
     const mod = Number(actor.system?.abilities?.[key]?.mod);
     if (!Number.isFinite(mod)) continue;
@@ -301,11 +325,13 @@ export function registerMananiteHooks() {
     spendCrystalCharges(use).catch((error) => console.error(`${MODULE_ID} | Mananite charges`, error));
   });
 
-  Hooks.on("renderAttackDialog", (app, html) => {
+  const paintAmmo = (app, html) => {
     try {
       renderMananitePicker(app, html);
     } catch (error) {
       console.error(`${MODULE_ID} | Mananite ammo list`, error);
     }
-  });
+  };
+  Hooks.on("renderActionDialog", paintAmmo);
+  Hooks.on("renderAttackDialog", paintAmmo);
 }

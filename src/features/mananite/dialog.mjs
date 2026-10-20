@@ -75,10 +75,10 @@ export function renderMananitePicker(app, html) {
   const item = use?.item;
   const gun = gunData(item);
   if (!root || !gun) return;
-  const dialog = root.closest(".attack-dialog") ?? root;
-  dialog.classList.add("cf-mananite-ammo");
+  const dialog = root.closest(".action-dialog, .attack-dialog, .application") ?? root;
+  dialog.classList.add("attack-dialog", "cf-mananite-ammo");
   if (gunKind(item) === "caster-gun") {
-    for (const box of root.querySelectorAll('input[name="power-attack"]')) {
+    for (const box of root.querySelectorAll('input[name="config.powerAttack"], input[name="power-attack"]')) {
       box.checked = false;
       box.disabled = true;
     }
@@ -161,7 +161,7 @@ function buildSelect({ use, crystals, attacks, index, selected }) {
     event.preventDefault();
     event.stopPropagation();
     const opening = !list.classList.contains("open");
-    select.closest(".attack-dialog")?.querySelectorAll(".cf-crystal-list.open").forEach((open) => open.classList.remove("open"));
+    select.closest(".action-dialog, .attack-dialog")?.querySelectorAll(".cf-crystal-list.open").forEach((open) => open.classList.remove("open"));
     list.classList.toggle("open", opening);
   });
 

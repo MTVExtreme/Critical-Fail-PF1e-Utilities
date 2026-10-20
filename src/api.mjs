@@ -1,6 +1,5 @@
 import { MODULE_ID } from "./constants.mjs";
 import { api as surgeApi } from "./features/surge/index.mjs";
-import { api as guileApi } from "./features/guile/index.mjs";
 import { api as rollStatsApi } from "./features/rollstats/index.mjs";
 import { api as mananiteApi } from "./features/mananite/index.mjs";
 import { api as astralApi } from "./features/astral/index.mjs";
@@ -13,7 +12,6 @@ export function registerApi() {
     id: MODULE_ID,
     version: mod.version,
     surge: surgeApi,
-    guile: guileApi,
     rollStats: rollStatsApi,
     mananite: mananiteApi,
     astral: astralApi,

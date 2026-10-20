@@ -18,11 +18,12 @@ export function registerPoolChanges() {
     },
   });
 
-  Hooks.on("pf1GetChangeFlat", (result, target) => {
+  Hooks.on("pf1.change.targets", (target, result) => {
+    if (!Array.isArray(result)) return;
     if (target === CHANGE_TARGETS.shieldMax) result.push(SHIELD_MAX);
     else if (target === CHANGE_TARGETS.burn) result.push(BURN_VALUE);
   });
-  Hooks.on("pf1PrepareDerivedActorData", finishPoolChanges);
+  Hooks.on("pf1.actor.prepareDerivedData", finishPoolChanges);
 }
 
 function finishPoolChanges(actor) {

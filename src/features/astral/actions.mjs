@@ -290,7 +290,7 @@ export function bindReflectionButton(html) {
       const doc = await fromUuid(uuid);
       const actor = doc?.actor || doc;
       if (!actor || !damage) return;
-      await pf1.documents.actor.ActorPF.applyDamage(damage, { targets: [actor], interactive: true });
+      await pf1.documents.ActorPF.applyDamage(damage, { targets: [actor], interactive: true });
     });
   }
 }

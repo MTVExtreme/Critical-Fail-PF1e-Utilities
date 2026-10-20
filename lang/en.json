@@ -7,7 +7,7 @@
   "CFUTIL.Settings.skipLifeAndHealingSurges": "Skip Life Sphere & Conjuration (healing)",
   "CFUTIL.Settings.skipLifeAndHealingSurgesHint": "When enabled, Life sphere talents and Conjuration (healing) spells never trigger surge rolls.",
   "CFUTIL.Settings.enableGuileTab": "Show Spheres of Guile on the Spheres tab",
-  "CFUTIL.Settings.enableGuileTabHint": "Lists skill spheres, talent counts, granted skill ranks, and skill talents in a Spheres of Guile block on the pf1spheres Spheres tab. Requires the Spheres for Pathfinder 1e module.",
+  "CFUTIL.Settings.enableGuileTabHint": "Spheres of Guile now lives in the Critical Fail Spheres module. This setting is unused.",
   "CFUTIL.Guile.Header": "Spheres of Guile",
   "CFUTIL.Guile.Talents": "Talents",
   "CFUTIL.Guile.Ranks": "Ranks",

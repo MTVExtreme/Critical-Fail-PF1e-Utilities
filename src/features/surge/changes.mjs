@@ -24,8 +24,8 @@ export function registerSurgeChanges() {
 
   foundry.utils.mergeObject(CONFIG.PF1.buffTargets, targets);
 
-  Hooks.on("pf1PrepareBaseActorData", prepareSurgeActorData);
-  Hooks.on("pf1GetChangeFlat", onGetChangeFlat);
+  Hooks.on("pf1.actor.prepareBaseData", prepareSurgeActorData);
+  Hooks.on("pf1.change.targets", onGetChangeFlat);
 }
 
 /**
@@ -45,10 +45,11 @@ function prepareSurgeActorData(actor) {
 }
 
 /**
- * @param {string[]} result
  * @param {string} target
+ * @param {string[]} result
  */
-function onGetChangeFlat(result, target) {
+function onGetChangeFlat(target, result) {
+  if (!Array.isArray(result)) return;
   switch (target) {
     case CHANGE_TARGETS.base:
       result.push("system.cfSurge.base.total");

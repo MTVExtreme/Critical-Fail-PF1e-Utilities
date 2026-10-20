@@ -100,6 +100,14 @@ async function applyEffects(actor, effects, shield) {
   }
 }
 
+function hasEntry(value, needle) {
+  if (!value) return false;
+  const wanted = String(needle).toLowerCase();
+  const source = value.names ?? value.standard ?? value;
+  const list = typeof source?.has === "function" ? [...source] : Array.isArray(source) ? source : [];
+  return list.some((entry) => String(entry?.id || entry?.name || entry).toLowerCase() === wanted);
+}
+
 function harmfulCondition(item, shield) {
   if (!item || item.getFlag?.(MODULE_ID, "astralAllow")) return false;
   if (item.type !== "buff") return false;
@@ -165,9 +173,8 @@ export function registerAstralHooks() {
           turn: game.combat?.turn || 0,
         };
       }
-      const descriptors = options.item?.system?.descriptors || [];
       const types = (options.instances || []).flatMap((inst) => [...(inst.types || [])]).map((type) => String(type).toLowerCase());
-      if (descriptors.includes("evil") || types.includes("evil")) next.regenSuppressed = true;
+      if (hasEntry(options.item?.system?.descriptors, "evil") || types.includes("evil")) next.regenSuppressed = true;
       if (result.body + (result.tempTaken || 0) !== 0) stageShield(actor, next);
       else void actor.update(shieldFlagUpdate(next));
       void applyEffects(actor, result.effects, next);

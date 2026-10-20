@@ -21,11 +21,26 @@ export async function setBurnPoints(actor, value) {
 }
 
 export function registerBurnRest() {
-  Hooks.on("pf1PreActorRest", (actor, options, updateData) => {
-    if (!options?.restoreHealth) return;
+  Hooks.on("pf1.rest.configure", (actor, options, operations) => {
+    if (!options?.restoreHealth || !Array.isArray(operations)) return;
     const burn = getBurn(actor);
     if (!burn.value) return;
-    foundry.utils.setProperty(updateData, `flags.${MODULE_ID}.${FLAG}`, { ...burn, value: 0 });
+
+    const existing = operations.find((op) => op?.action === "update" && op.documentName === "Actor");
+    let actorUpdate = existing?.updates?.find((update) => update._id === actor.id);
+    if (!actorUpdate) {
+      actorUpdate = { _id: actor.id };
+      if (existing?.updates) existing.updates.push(actorUpdate);
+      else {
+        operations.push({
+          action: "update",
+          documentName: "Actor",
+          updates: [actorUpdate],
+          pack: actor.pack ?? null,
+        });
+      }
+    }
+    foundry.utils.setProperty(actorUpdate, `flags.${MODULE_ID}.${FLAG}`, { ...burn, value: 0 });
   });
 }
 

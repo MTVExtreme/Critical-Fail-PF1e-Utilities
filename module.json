@@ -1,8 +1,8 @@
 {
   "id": "critical-fail-pf1e-utilities",
   "title": "Critical Fail PF1e Utilities",
-  "description": "Campaign utilities for Critical Fail Pathfinder 1e games, including Surge Chance, Spheres of Guile, roll statistics, Mananite ammunition for caster guns, and Astral Sphinx energy shields.",
-  "version": "0.4.3",
+  "description": "Campaign utilities for Critical Fail Pathfinder 1e games, including Surge Chance, roll statistics, Mananite ammunition for caster guns, and Astral Sphinx energy shields. Spheres of Guile lives in Critical Fail Spheres.",
+  "version": "14.0.5",
   "authors": [
     {
       "name": "MTVExtreme",
@@ -19,7 +19,9 @@
     "module.mjs"
   ],
   "styles": [
-    "styles/module.css"
+    {
+      "src": "styles/module.css"
+    }
   ],
   "languages": [
     {
@@ -41,18 +43,16 @@
     ],
     "recommends": [
       {
-        "id": "pf1spheres",
+        "id": "critical-fail-spheres",
         "type": "module",
-        "compatibility": {
-          "minimum": "0.9.0"
-        }
+        "reason": "Spheres of Guile and the v14 Spheres sheet."
       }
     ]
   },
   "compatibility": {
-    "minimum": "13",
-    "verified": "13.351",
-    "maximum": "13"
+    "minimum": "14",
+    "verified": "14",
+    "maximum": "14"
   },
   "socket": false,
   "library": false

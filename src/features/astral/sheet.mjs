@@ -154,7 +154,7 @@ function injectShield(app, root) {
         <div class="value"><input class="cf-shield-value" type="text" inputmode="numeric" value="${Number(shield.value) || 0}" ${editable ? "" : "disabled"}></div>
       </div>
       <div class="info-box maximum">
-        <h5>${game.i18n.localize("PF1.Maximum")}</h5>
+        <h5>${game.i18n.localize("PF1.Max.Label")}</h5>
         <div class="value"><input class="cf-shield-max" type="text" inputmode="numeric" value="${Number(shield.max) || 0}" ${editable ? "" : "disabled"}></div>
       </div>
     </div>
@@ -209,18 +209,23 @@ function injectBurn(app, root) {
 
 async function showShieldTooltip(actor, element) {
   const shield = actor.getFlag(MODULE_ID, "energyShield") || { value: 0, max: 0 };
-  const base = `flags.${MODULE_ID}.energyShield`;
-  await activateExtendedTooltip(element, {
-    header: game.i18n.localize("CFUTIL.Shield.Hint"),
+  const detailPath = `flags.${MODULE_ID}.energyShield.max`;
+  let listed = [];
+  try {
+    listed = actor.getSourceDetails?.(detailPath) ?? [];
+  } catch (error) {
+    console.error(`${MODULE_ID} | Shield tooltip`, error);
+  }
+  const context = {
+    header: game.i18n.localize("CFUTIL.Shield.Label"),
+    hint: game.i18n.localize("CFUTIL.Shield.Hint"),
     paths: [
-      { path: `@${base}.value`, value: Number(shield.value) || 0 },
-      { path: `@${base}.max`, value: Number(shield.max) || 0 },
+      { path: game.i18n.localize("PF1.Current"), value: Number(shield.value) || 0 },
+      { path: game.i18n.localize("PF1.Max.Label"), value: Number(shield.max) || 0 },
     ],
-    sources: [{
-      untyped: true,
-      sources: [{ name: game.i18n.localize("CFUTIL.Shield.Label"), value: Number(shield.max) || 0 }],
-    }],
-  });
+  };
+  if (listed.length) context.sources = [{ untyped: true, sources: listed }];
+  await activateExtendedTooltip(element, context);
 }
 
 async function showBurnTooltip(actor, element) {
@@ -238,8 +243,8 @@ async function showBurnTooltip(actor, element) {
 async function activateExtendedTooltip(element, context) {
   const render = foundry.applications?.handlebars?.renderTemplate;
   if (!render) return;
-  const html = await render("systems/pf1/templates/extended-tooltip.hbs", context);
+  const html = await render("systems/pf1/templates/tooltips/source-breakdown-tooltip.hbs", context);
   const template = document.createElement("template");
   template.innerHTML = html;
-  game.tooltip.activate(element, { content: template.content, cssClass: "pf1 extended" });
+  game.tooltip.activate(element, { html: template.content, cssClass: "pf1 source-breakdown" });
 }

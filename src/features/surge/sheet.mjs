@@ -25,6 +25,7 @@ export function registerSurgeSheetUI() {
     injectItemSheetUI(app, html);
   });
 
+  Hooks.on("renderActionSheet", injectActionSheetUI);
   Hooks.on("renderItemActionSheet", injectActionSheetUI);
 }
 
@@ -118,7 +119,7 @@ function injectActorSettings(app, root) {
  * @param {HTMLElement} root
  */
 function injectSpellbookButtons(app, root) {
-  const summaries = root.querySelectorAll(".spellbook-configuration .summary");
+  const summaries = root.querySelectorAll(".spellcasting-profile header.summary, .spellbook-configuration .summary");
   for (const summary of summaries) {
     if (summary.querySelector(".cf-surge-chance")) continue;
 

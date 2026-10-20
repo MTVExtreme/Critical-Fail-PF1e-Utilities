@@ -10,6 +10,7 @@
 }
 
 /* Spells tab: sit under Concentration / CL row */
+.spellcasting-profile header.summary .cf-surge-chance,
 .spellbook-configuration .summary .cf-surge-chance {
   align-self: stretch;
 }
