@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-This is the Foundry V13 line (0.4.x). The Foundry V14 line (14.x) is on the `main` branch.
+This is the Foundry V13 line (0.x). The Foundry V14 line (14.x) is on the `main` branch.
 
 ## [Unreleased]
 
