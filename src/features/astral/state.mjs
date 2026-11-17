@@ -20,6 +20,10 @@ export function blankShield(overrides = {}) {
     form: null,
     showOnSheet: false,
     tempFirst: false,
+    fastHealing: 0,
+    regeneration: 0,
+    regenBypass: "",
+    regenStopped: false,
     ...overrides,
   };
 }

@@ -1,0 +1,86 @@
+<section class="cf-surge-config-body">
+  <fieldset>
+    <legend>{{localize "CFUTIL.SurgeConfig.ChanceHeader"}}</legend>
+    <p class="hint">{{localize "CFUTIL.SurgeConfig.ChanceHint"}}</p>
+    <div class="form-group">
+      <label>{{localize "CFUTIL.SurgeConfig.PerLevel"}}</label>
+      <div class="form-fields"><input type="number" name="perLevel" value="{{config.perLevel}}" step="any"></div>
+      <p class="hint">{{localize "CFUTIL.SurgeConfig.PerLevelHint"}}</p>
+    </div>
+    <div class="form-group">
+      <label>{{localize "CFUTIL.SurgeConfig.PerCL"}}</label>
+      <div class="form-fields"><input type="number" name="perCL" value="{{config.perCL}}" step="any"></div>
+      <p class="hint">{{localize "CFUTIL.SurgeConfig.PerCLHint"}}</p>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>{{localize "CFUTIL.SurgeConfig.AreaHeader"}}</legend>
+    <p class="hint">{{localize "CFUTIL.SurgeConfig.AreaHint"}}</p>
+    <div class="form-group">
+      <label>{{localize "CFUTIL.SurgeConfig.AreaName"}}</label>
+      <div class="form-fields"><input type="text" name="areaName" value="{{config.areaName}}" placeholder="{{localize "CFUTIL.SurgeConfig.AreaDefaultName"}}"></div>
+    </div>
+    <div class="form-group">
+      <label>{{localize "CFUTIL.SurgeConfig.AreaMultiplier"}}</label>
+      <div class="form-fields"><input type="number" name="areaMultiplier" value="{{config.areaMultiplier}}" min="0" step="any"></div>
+      <p class="hint">{{localize "CFUTIL.SurgeConfig.AreaMultiplierHint"}}</p>
+    </div>
+    <div class="form-group">
+      <label>{{localize "CFUTIL.SurgeConfig.AreaFlat"}}</label>
+      <div class="form-fields"><input type="number" name="areaFlat" value="{{config.areaFlat}}" step="1"></div>
+      <p class="hint">{{localize "CFUTIL.SurgeConfig.AreaFlatHint"}}</p>
+    </div>
+    <div class="cf-surge-preview">
+      <span class="cf-surge-preview-title">{{localize "CFUTIL.SurgeConfig.Preview"}}</span>
+      {{#each preview as |row|}}
+      <span class="cf-surge-preview-cell" data-tooltip="{{localize "CFUTIL.SurgeConfig.PreviewCell" level=row.level cl=row.cl}}">
+        <strong>{{row.level}}</strong> <span data-cf-preview>{{row.spell}}% · {{row.sphere}}%</span>
+      </span>
+      {{/each}}
+      <p class="hint">{{localize "CFUTIL.SurgeConfig.PreviewHint"}}</p>
+    </div>
+    <button type="button" data-action="resetChance"><i class="fa-solid fa-rotate-left" inert></i> {{localize "CFUTIL.SurgeConfig.ResetChance"}}</button>
+  </fieldset>
+
+  <fieldset>
+    <legend>{{localize "CFUTIL.SurgeConfig.SeverityHeader"}}</legend>
+    <p class="hint">{{localize "CFUTIL.SurgeConfig.SeverityHint"}}</p>
+    <table class="cf-surge-bands">
+      <thead>
+        <tr>
+          <th>{{localize "CFUTIL.SurgeConfig.BandName"}}</th>
+          <th>{{localize "CFUTIL.SurgeConfig.BandChance"}}</th>
+          <th>{{localize "CFUTIL.SurgeConfig.BandRange"}}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each bands as |band|}}
+        <tr data-index="{{band.index}}">
+          <td>
+            <input type="hidden" name="severity.{{band.index}}.id" value="{{band.id}}">
+            <input type="hidden" name="severity.{{band.index}}.labelKey" value="{{band.labelKey}}">
+            <input type="text" name="severity.{{band.index}}.label" value="{{band.label}}" placeholder="{{band.placeholder}}">
+          </td>
+          <td><input type="number" name="severity.{{band.index}}.chance" value="{{band.chance}}" min="0" max="100" step="1"></td>
+          <td class="cf-surge-range" data-cf-range="{{band.index}}">{{band.range}}</td>
+          <td>
+            {{#if ../canRemove}}
+            <a data-action="removeBand" data-tooltip="{{localize "CFUTIL.SurgeConfig.RemoveBand"}}"><i class="fa-solid fa-trash" inert></i></a>
+            {{/if}}
+          </td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+    <div class="cf-surge-total {{#unless totalOk}}bad{{/unless}}">
+      {{localize "CFUTIL.SurgeConfig.Total"}}: <span data-cf-total>{{total}}</span>%
+      <span class="hint">{{localize "CFUTIL.SurgeConfig.TotalHint"}}</span>
+    </div>
+    <div class="cf-surge-band-actions">
+      <button type="button" data-action="addBand"><i class="fa-solid fa-plus" inert></i> {{localize "CFUTIL.SurgeConfig.AddBand"}}</button>
+      <button type="button" data-action="resetSeverity"><i class="fa-solid fa-rotate-left" inert></i> {{localize "CFUTIL.SurgeConfig.ResetSeverity"}}</button>
+    </div>
+  </fieldset>
+</section>

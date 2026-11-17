@@ -3,6 +3,7 @@ import { isAstralEnabled } from "../../settings.mjs";
 import { getBurn, setBurnPoints, setBurnShown } from "./burn.mjs";
 import { setShieldPoints, setShieldShown, setShieldTempFirst } from "./state.mjs";
 import { markDirectPool } from "./token-health.mjs";
+import { formatRegen, parseRegen, setShieldRegen } from "./regen.mjs";
 
 function toElement(html) {
   if (!html) return null;
@@ -47,6 +48,7 @@ export function registerShieldSheet() {
       const root = toElement(html);
       injectShieldSettings(app, root);
       injectShield(app, root);
+      injectShieldRegen(app, root);
       injectBurn(app, root);
       watchDirectSubtraction(app, root);
     } catch (error) {
@@ -179,6 +181,109 @@ function injectShield(app, root) {
   });
   box.addEventListener("pointerleave", () => game.tooltip.deactivate());
   anchor.after(box);
+}
+
+/** Shield Regeneration and Shield Fast Healing rows, placed after PF1's own Fast Healing field. */
+function injectShieldRegen(app, root) {
+  if (!root || root.querySelector(".cf-shield-regen-row")) return;
+  const prepared = app.actor.getFlag(MODULE_ID, "energyShield");
+  if (!prepared?.showOnSheet) return;
+  const saved = app.actor._source?.flags?.[MODULE_ID]?.energyShield || {};
+  const editable = app.actor.isOwner;
+  const none = game.i18n.localize("PF1.None");
+
+  const rows = [
+    {
+      key: "regeneration",
+      label: "CFUTIL.Shield.Regeneration",
+      hint: "CFUTIL.Shield.RegenerationHint",
+      text: formatRegen(saved.regeneration, saved.regenBypass),
+      saved: Number(saved.regeneration) || 0,
+      total: Number(prepared.regeneration) || 0,
+      stopped: Boolean(prepared.regenStopped) && Number(prepared.regeneration) > 0,
+    },
+    {
+      key: "fastHealing",
+      label: "CFUTIL.Shield.FastHealing",
+      hint: "CFUTIL.Shield.FastHealingHint",
+      text: Number(saved.fastHealing) > 0 ? String(Math.floor(Number(saved.fastHealing))) : "",
+      saved: Number(saved.fastHealing) || 0,
+      total: Number(prepared.fastHealing) || 0,
+      stopped: false,
+    },
+  ];
+
+  const pf1Input = root.querySelector('input[name="system.traits.fastHealing"]')
+    || root.querySelector('input[name="system.traits.regen"]');
+  const pf1Row = pf1Input?.closest(".fast-healing, .regeneration, .form-group, li");
+
+  const build = (row) => {
+    let element;
+    if (pf1Row) {
+      element = pf1Row.cloneNode(true);
+      element.classList.remove("fast-healing", "regeneration", "inactive");
+      element.removeAttribute("data-tooltip-extended");
+      element.querySelectorAll("[data-tooltip-extended]").forEach((node) => node.removeAttribute("data-tooltip-extended"));
+    } else {
+      element = document.createElement("div");
+      element.className = "form-group";
+      element.innerHTML = `<label></label><div class="form-fields"><input type="text"></div>`;
+    }
+    element.classList.add("cf-shield-regen-row", `cf-shield-${row.key}`);
+    if (!row.text && !row.total) element.classList.add("inactive");
+    const label = element.querySelector("label");
+    if (label) label.textContent = game.i18n.localize(row.label);
+    const input = element.querySelector("input");
+    if (!input) return null;
+    input.removeAttribute("name");
+    input.removeAttribute("id");
+    input.type = "text";
+    input.value = row.text;
+    input.placeholder = none;
+    input.disabled = !editable;
+
+    const tip = [game.i18n.localize(row.hint)];
+    if (row.total !== row.saved) tip.push(game.i18n.format("CFUTIL.Shield.FromChanges", { total: row.total }));
+    if (row.stopped) tip.push(game.i18n.localize("CFUTIL.Shield.RegenStopped"));
+    element.dataset.tooltip = tip.join(" ");
+
+    if (row.total !== row.saved) {
+      const total = document.createElement("span");
+      total.className = "cf-shield-regen-total";
+      total.textContent = `(${row.total})`;
+      input.after(total);
+    }
+    if (row.stopped) {
+      const icon = document.createElement("i");
+      icon.className = "fa-solid fa-ban cf-shield-regen-stopped";
+      input.after(icon);
+    }
+
+    input.addEventListener("focus", () => input.select());
+    input.addEventListener("change", (event) => {
+      event.stopPropagation();
+      const parsed = parseRegen(input.value);
+      if (!parsed || (row.key === "fastHealing" && parsed.bypass)) {
+        ui.notifications.warn(game.i18n.localize("CFUTIL.Shield.RegenInvalid"));
+        input.value = row.text;
+        return;
+      }
+      const patch = row.key === "regeneration"
+        ? { regeneration: parsed.amount, regenBypass: parsed.bypass }
+        : { fastHealing: parsed.amount };
+      setShieldRegen(app.actor, patch).catch((error) => console.error(`${MODULE_ID} | Shield regeneration`, error));
+    });
+    return element;
+  };
+
+  const elements = rows.map(build).filter(Boolean);
+  if (!elements.length) return;
+  if (pf1Row) {
+    pf1Row.after(...elements);
+    return;
+  }
+  const settings = root.querySelector(".cf-shield-actor-settings .cf-shield-toggles");
+  if (settings) settings.append(...elements);
 }
 
 function injectBurn(app, root) {

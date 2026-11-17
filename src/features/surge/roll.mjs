@@ -1,11 +1,5 @@
-import {
-  MODULE_ID,
-  SEVERITY_BANDS,
-  SPELL_SURGE_PER_LEVEL,
-  SPHERE_SURGE_PER_CL,
-  DICE_MODES,
-  FLAG_DICE_MODE,
-} from "../../constants.mjs";
+import { MODULE_ID, DICE_MODES, FLAG_DICE_MODE } from "../../constants.mjs";
+import { applySurgeArea, getSurgeConfig, severityRanges, surgeAreaSummary } from "./config.mjs";
 import { isSurgeEnabled } from "../../settings.mjs";
 import { getSurgeModifiers } from "./changes.mjs";
 import { isItemSurgeDisabled } from "./action-surge.mjs";
@@ -18,8 +12,9 @@ import { isItemSurgeDisabled } from "./action-surge.mjs";
 export function chanceFromSpellLevel(spellLevel, actor = null) {
   const level = Math.max(0, Math.floor(Number(spellLevel) || 0));
   const mods = getSurgeModifiers(actor);
-  const perLevel = SPELL_SURGE_PER_LEVEL + mods.perLevel;
-  return Math.clamp(Math.floor(level * perLevel + mods.base), 0, 100);
+  const config = getSurgeConfig();
+  const perLevel = config.perLevel + mods.perLevel;
+  return applySurgeArea(level * perLevel + mods.base, config);
 }
 
 /**
@@ -30,8 +25,9 @@ export function chanceFromSpellLevel(spellLevel, actor = null) {
 export function chanceFromSphereCL(casterLevel, actor = null) {
   const cl = Math.max(0, Math.floor(Number(casterLevel) || 0));
   const mods = getSurgeModifiers(actor);
-  const perCL = SPHERE_SURGE_PER_CL + mods.perCL;
-  return Math.clamp(Math.floor(cl * perCL + mods.base), 0, 100);
+  const config = getSurgeConfig();
+  const perCL = config.perCL + mods.perCL;
+  return applySurgeArea(cl * perCL + mods.base, config);
 }
 
 /**
@@ -48,13 +44,14 @@ export function avoidSurgeDC(chancePercent) {
  * @param {number} total
  */
 export function severityFromRoll(total) {
-  const n = Math.clamp(Math.floor(Number(total) || 0), 0, 100);
-  const band = SEVERITY_BANDS.find((b) => n >= b.min && n <= b.max) ?? SEVERITY_BANDS[0];
+  const n = Math.clamp(Math.floor(Number(total) || 0), 1, 100);
+  const bands = severityRanges().filter((b) => b.min != null);
+  const band = bands.find((b) => n >= b.min && n <= b.max) ?? bands.at(-1) ?? { id: "none", min: 1, max: 100, label: "—" };
   return {
     id: band.id,
     min: band.min,
     max: band.max,
-    label: game.i18n.localize(band.labelKey),
+    label: band.label,
   };
 }
 
@@ -131,9 +128,12 @@ export async function rollSurgeChance({ actor, chance, sourceLabel, item = null,
   const diceLabel = game.i18n.localize(DICE_MODES[diceMode].labelKey);
   const chanceDiceDetail = formatDiceResults(chanceRoll);
 
+  const areaSummary = surgeAreaSummary();
+
   let content = `
     <div class="critical-fail-pf1e-utilities cf-surge-card" data-mode="${mode}">
-      <div class="cf-surge-source"><em>${esc(sourceLabel)}</em></div>
+      <div class="cf-surge-source"><em>${esc(sourceLabel)}</em></div>${areaSummary ? `
+      <div class="cf-surge-area notes"><i class="fa-solid fa-bolt" inert></i> ${esc(areaSummary)}</div>` : ""}
       <div><strong>${game.i18n.localize("CFUTIL.Surge.AvoidDC")}:</strong> ${dcDisplay}
         <span class="notes">(${chancePercent}% · ${game.i18n.format("CFUTIL.Surge.SurgeOnRange", { chance: chancePercent })} · ${esc(diceLabel)})</span>
       </div>

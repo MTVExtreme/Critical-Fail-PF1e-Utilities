@@ -20,6 +20,7 @@ import { registerBossBar } from "./bossbar.mjs";
 import { getBurn, registerBurnRest, syncBurnUnconscious } from "./burn.mjs";
 import { announceShieldChange, paintShieldFeedback, rememberPools } from "./feedback.mjs";
 import { registerShieldSheet } from "./sheet.mjs";
+import { keepSavedRegen, stopsShieldRegen, tickShieldRegen } from "./regen.mjs";
 import { registerTokenBars, refreshTokenBars } from "./bar.mjs";
 import {
   getShield,
@@ -153,11 +154,16 @@ export function registerAstralHooks() {
         tempFirst: Boolean(shield.tempFirst),
         temp: Math.max(0, Number(hp.temp) || 0),
       });
-      if (!result?.rewrite) return;
+      const stopsRegen = stopsShieldRegen(shield, options);
+      if (!result?.rewrite) {
+        if (stopsRegen && !shield.regenStopped) void actor.update({ [`flags.${MODULE_ID}.energyShield.regenStopped`]: true });
+        return;
+      }
       options.value = result.body + (result.tempTaken || 0);
       options.reduction = 0;
       options.ratio = 1;
       const next = { ...shield, value: result.shieldValue };
+      if (stopsRegen) next.regenStopped = true;
       if (result.effects.haste) next.hasteRounds = 3;
       if (result.effects.emp) {
         next.suppressedUntil = {
@@ -201,6 +207,14 @@ export function registerAstralHooks() {
     }
   });
 
+  Hooks.on("preUpdateActor", (actor, update, options) => {
+    try {
+      keepSavedRegen(actor, update, options);
+    } catch (error) {
+      console.error(`${MODULE_ID} | Shield regeneration`, error);
+    }
+  });
+
   Hooks.on("preCreateItem", (item) => {
     if (!isAstralEnabled()) return;
     const actor = item.actor || item.parent;
@@ -224,8 +238,9 @@ export function registerAstralHooks() {
     if (!("turn" in changed) && !("round" in changed)) return;
     const actor = combat.combatant?.actor;
     const shield = getShield(actor);
-    if (!isAstralShield(shield) || shield.coreRemoved) return;
-    advanceShieldTurn(actor, { quiet: true }).catch((error) => console.error(`${MODULE_ID} | Astral turn`, error));
+    if (!shield || shield.coreRemoved) return;
+    const turn = isAstralShield(shield) ? advanceShieldTurn(actor, { quiet: true }) : tickShieldRegen(actor, shield);
+    turn.catch((error) => console.error(`${MODULE_ID} | Shield turn`, error));
   });
 
   const bind = (_message, html) => bindReflectionButton(html);

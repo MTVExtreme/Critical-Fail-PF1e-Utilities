@@ -802,3 +802,78 @@
 @keyframes cf-astral-flicker {
   50% { opacity: 0.05; }
 }
+
+/* Damage min/max buttons on attack cards */
+.chat-message .chat-attack .cf-dmg-ctrl {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+.chat-message .chat-attack .cf-dmg-ctrl.busy {
+  pointer-events: none;
+  opacity: 0.4;
+}
+.chat-message .chat-attack .cf-dmg-btn {
+  cursor: pointer;
+  font-size: 0.85em;
+  line-height: 1;
+  opacity: 0.6;
+}
+.chat-message .chat-attack .cf-dmg-btn:hover {
+  opacity: 1;
+  text-shadow: 0 0 6px var(--color-shadow-primary, #ff6400);
+}
+.chat-message .chat-attack .cf-dmg-btn-min { color: #b33a3a; }
+.chat-message .chat-attack .cf-dmg-btn-max { color: #2e7d32; }
+.chat-message .chat-attack .cf-dmg-btn-reset { color: #1f5fa8; }
+.chat-message .chat-attack .inline-roll.cf-dmg-max { box-shadow: inset 0 -2px 0 #2e7d32; }
+.chat-message .chat-attack .inline-roll.cf-dmg-min { box-shadow: inset 0 -2px 0 #b33a3a; }
+.chat-message .chat-attack .fake-inline-roll.cf-dmg-adjusted,
+.chat-message .chat-attack .total.cf-dmg-adjusted { font-style: italic; }
+
+/* Damage min/max on /damage and /heal cards */
+.chat-message .damage-card .cf-dmg-ctrl { display: inline-flex; align-items: center; gap: 2px; margin-right: 4px; vertical-align: middle; }
+.chat-message .damage-card .cf-dmg-ctrl.busy { pointer-events: none; opacity: 0.4; }
+.chat-message .damage-card .cf-dmg-btn { cursor: pointer; font-size: 0.75em; line-height: 1; opacity: 0.6; }
+.chat-message .damage-card .cf-dmg-btn:hover { opacity: 1; text-shadow: 0 0 6px var(--color-shadow-primary, #ff6400); }
+.chat-message .damage-card .cf-dmg-btn-min { color: #b33a3a; }
+.chat-message .damage-card .cf-dmg-btn-max { color: #2e7d32; }
+.chat-message .damage-card .cf-dmg-btn-reset { color: #1f5fa8; }
+.chat-message .damage-card .roll-total.cf-dmg-adjusted { font-style: italic; }
+.chat-message .damage-card .part-header .cf-dmg-ctrl { flex: 0 0 auto; }
+
+/* Surge rules settings window */
+.cf-surge-config .cf-surge-config-body fieldset { margin-bottom: 0.5rem; }
+.cf-surge-config .cf-surge-bands { width: 100%; border-collapse: collapse; margin: 0.25rem 0; }
+.cf-surge-config .cf-surge-bands th { text-align: left; font-weight: bold; padding: 2px 4px; }
+.cf-surge-config .cf-surge-bands td { padding: 2px 4px; vertical-align: middle; }
+.cf-surge-config .cf-surge-bands td:nth-child(2) input { width: 5em; }
+.cf-surge-config .cf-surge-bands td.cf-surge-range { white-space: nowrap; width: 6em; }
+.cf-surge-config .cf-surge-bands td:last-child { width: 2em; text-align: center; }
+.cf-surge-config .cf-surge-total { margin: 0.25rem 0; font-weight: bold; }
+.cf-surge-config .cf-surge-total.bad { color: #b33a3a; }
+.cf-surge-config .cf-surge-total .hint { font-weight: normal; }
+.cf-surge-config .cf-surge-band-actions { display: flex; gap: 0.5rem; }
+.cf-surge-config .cf-surge-preview { display: flex; flex-wrap: wrap; gap: 2px 10px; margin: 0.25rem 0 0.5rem; font-size: 0.9em; }
+.cf-surge-config .cf-surge-preview-title { flex: 0 0 100%; font-weight: bold; }
+.cf-surge-config .cf-surge-preview .hint { flex: 0 0 100%; margin: 0; }
+.cf-surge-card .cf-surge-area { font-size: 0.9em; }
+
+/* Surge rules window: settings scroll, Save stays at the bottom */
+.cf-surge-config .window-content { display: flex; flex-direction: column; overflow: hidden; }
+.cf-surge-config .cf-surge-config-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding-right: 4px; }
+.cf-surge-config .form-footer { flex: 0 0 auto; }
+
+/* Shield Regeneration / Shield Fast Healing rows */
+.cf-shield-regen-total {
+  margin-left: 0.25em;
+  opacity: 0.75;
+  white-space: nowrap;
+}
+
+.cf-shield-regen-stopped {
+  margin-left: 0.25em;
+  color: var(--color-level-error, #c62828);
+}

@@ -107,12 +107,20 @@ function isHealAction(message, actor) {
 /**
  * Collect kept natural d20 results from a Roll instance or Roll JSON, walking nested terms.
  * Discarded (kh/kl, rerolled) results are skipped so `2d20kh` counts once.
+ * Take 10, Take 20, and any other fixed die (`options.staticRoll` or `method: "manual"`) are skipped.
  * @param {object|null} roll
  * @param {number[]} out
  */
 export function collectD20Faces(roll, out) {
-  if (!roll) return;
+  if (!roll || isFixedDieRoll(roll)) return;
   walkTerms(roll.terms, out, 0);
+}
+
+/** True when this roll replaced the d20 with a chosen number instead of rolling it. */
+function isFixedDieRoll(roll) {
+  if (Number.isFinite(Number(roll.options?.staticRoll))) return true;
+  const die = Array.isArray(roll.terms) ? roll.terms.find((term) => Number(term?.faces) === 20) : null;
+  return die?.method === "manual";
 }
 
 function walkTerms(terms, out, depth) {
@@ -120,6 +128,7 @@ function walkTerms(terms, out, depth) {
   for (const term of terms) {
     if (!term || typeof term !== "object") continue;
     if (Number(term.faces) === 20 && Array.isArray(term.results)) {
+      if (term.method === "manual") continue;
       for (const result of term.results) {
         if (!result || result.active === false || result.discarded) continue;
         const face = Number(result.result);

@@ -4,6 +4,7 @@ import { api as guileApi } from "./features/guile/index.mjs";
 import { api as rollStatsApi } from "./features/rollstats/index.mjs";
 import { api as mananiteApi } from "./features/mananite/index.mjs";
 import { api as astralApi } from "./features/astral/index.mjs";
+import { api as damageAdjustApi } from "./features/damage-adjust/index.mjs";
 
 export function registerApi() {
   const mod = game.modules.get(MODULE_ID);
@@ -17,5 +18,6 @@ export function registerApi() {
     rollStats: rollStatsApi,
     mananite: mananiteApi,
     astral: astralApi,
+    damageAdjust: damageAdjustApi,
   };
 }

@@ -3,6 +3,7 @@ import * as guile from "./guile/index.mjs";
 import * as rollstats from "./rollstats/index.mjs";
 import * as mananite from "./mananite/index.mjs";
 import * as astral from "./astral/index.mjs";
+import * as damageAdjust from "./damage-adjust/index.mjs";
 
 export const features = {
   surge,
@@ -10,4 +11,5 @@ export const features = {
   rollstats,
   mananite,
   astral,
+  damageAdjust,
 };

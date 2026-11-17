@@ -1,4 +1,5 @@
 import { MODULE_ID } from "../../constants.mjs";
+import { shieldRegenAmount } from "./regen.mjs";
 import {
   getShield,
   isSuppressed,
@@ -108,8 +109,9 @@ export async function advanceShieldTurn(actor, { quiet = false } = {}) {
       shield.regenSuppressed = false;
       if (!quiet) gmMessage(`<p>Evil damage suppresses ${actor.name}'s regeneration this turn.</p>`);
     }
-    shield.value = Math.min(shield.max, shield.value + (Number(shield.regen) || 0));
+    shield.value = Math.min(shield.max, shield.value + (Number(shield.regen) || 0) + shieldRegenAmount(shield));
   }
+  shield.regenStopped = false;
 
   if (shield.hasteRounds > 0) {
     shield.hasteRounds -= 1;

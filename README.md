@@ -9,7 +9,8 @@ Module id: `critical-fail-pf1e-utilities`
 ### Surge Chance
 - Auto-rolls when a **1st+ level spell** is cast/posted to chat, or a **Sphere magic** talent is used
 - Manual **Surge** on Spells tab (prompts for spell level) and Spheres tab (**pick a sphere** for CL)
-- Chance: `(8 + per-level mod) × spell level + base`, or `(4 + per-CL mod) × sphere CL + base`
+- Chance: `(8 + per-level mod) × spell level + base`, or `(4 + per-CL mod) × sphere CL + base`, then the world's surge area (multiplier, then flat bonus), kept between 0% and 100%
+- **Configure Surges** (module settings, GM only): change the 8% per spell level and 4% per sphere CL, set a named **surge area** with a chance multiplier and a flat bonus (negative for a low surge area), and edit the **severity table**: rename bands, change each band's % of the d100, add or remove bands, or reset to the defaults (Mild 30, Moderate 20, Severe 20, Extreme 20, Crazy 10). Chances must total 100%. Surge cards show the active surge area
 - Item **Changes** targets (Spells section): **Base Surge Chance**, **Surge % per Spell Level**, **Surge % per Sphere CL**
 - Actor **Settings** tab: roll `1d100`, `2d100kh`, or `2d100kl` for the chance roll
 - Item **Details** tab: disable surge for a specific spell/talent
@@ -24,6 +25,15 @@ Module id: `critical-fail-pf1e-utilities`
 - Module setting: **Show Spheres of Guile on the Spheres tab**
 - Pairs with the *Spheres of Guile Talents* pack in Critical Fail Shared, whose base spheres carry a `min(5 * @spheres.talents.<sphere>.value, @attributes.hd.total)` bonus skill rank Change (Vocation specialty talents and Working Folk grant `@attributes.hd.total`)
 
+### Damage min/max buttons
+- On Pathfinder attack cards, small dice buttons sit left of the **Damage** (and **Critical Damage**) total and left of each damage line
+- **Minimum** sets every die to 1; **Maximum** sets every die to its highest face. Flat bonuses are kept
+- The total buttons change every line in that column (the critical buttons also change the normal lines, because critical damage includes them). The line buttons change just that line
+- Once used, the two buttons become a **Reset** button that restores the original roll
+- The change is saved to the chat message, so everyone sees it and **Apply Damage** uses the new numbers
+- Works on `/d`, `/damage`, `/h`, and `/heal` cards too: buttons beside the **Damage**/**Healing** title change the whole roll, and buttons on each dice group in the roll breakdown (click the card to open it) change that group
+- Only the card's owner and GMs see the buttons. Module setting: **Damage min/max buttons**
+
 ### Roll Stats (GM tool)
 - **Roll Stats** button at the bottom of the **Actors** sidebar (GM only) opens a popup covering every player character
 - Per PC: d20 rolls, natural 20s and 1s (count and %), longest 20 / 1 streaks, most 20s and most 1s in any 10 consecutive rolls (party leaders are marked, for the two homebrew feats), average d20
@@ -37,6 +47,7 @@ Module id: `critical-fail-pf1e-utilities`
 
 ### Astral energy shield
 - The sheet Settings tab has **Show shield beside hit points**, off unless you turn it on for that actor. While it is on, a **Shield** box sits beside hit points. Set a maximum to turn the pool on. Hovering the box lists the raw shield values the same way hit points do. By default that pool is lost before hit points and temporary hit points. **Take Temp HP first**, beside that switch and off by default, loses temporary hit points before the shield. The token hit-point buttons use that same order, and the shield is drawn as the blue top half of the token bar.
+- While the shield is shown, **Shield Regeneration** and **Shield Fast Healing** fields sit under PF1's Fast Healing on the Attributes tab. At the start of the creature's turn in combat (primary GM client), the shield gets back that many points, up to its maximum. Write Regeneration like PF1 does, for example `5/acid, fire`: damage of a listed type stops shield regeneration on the creature's next turn (a stop icon shows on the sheet). Fast Healing is never stopped. Both are also in the Changes list (Health), so buffs can add to them, and nothing restores the shield while it is suppressed or the core is removed. For the sphinx, these add to its built-in 10 shield points per turn.
 - **Show burn beside nonlethal** adds a Burn box to the right of Nonlethal. The number is hit points of burn, kept separate from Nonlethal. If the two together are higher than current hit points, the creature falls unconscious. A rest that restores health clears burn. Burn is purple on the token bar, beside nonlethal, and in the hit-point hover tip.
 - Shield changes float over the token and, when Koboldworks Health Monitor is enabled, appear in its log. Healing is light blue and damage is dark blue. Burn uses the same log: light purple when burn is removed, dark purple when burn is taken.
 - For the sphinx, resistances apply before the shield. Damage reduction applies only to physical damage that gets past it.

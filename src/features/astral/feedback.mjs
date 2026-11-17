@@ -51,24 +51,46 @@ function scrollBurn(actor, delta) {
   });
 }
 
-function logPool(actor, delta, { heal, label, kind, word }) {
+function userHasActorAccess(user, actor) {
+  const level = CONST.DOCUMENT_OWNERSHIP_LEVELS.LIMITED;
+  if (actor?.testUserPermission?.(user, level)) return true;
+  const tokens = actor?.getActiveTokens?.(true, true) || [];
+  return tokens.some((token) => (token.document ?? token).testUserPermission?.(user, level));
+}
+
+/** GMs, plus players who can open this actor's sheet or one of its tokens. */
+function shieldAudience(actor) {
+  const ids = game.users.filter((user) => userHasActorAccess(user, actor)).map((user) => user.id);
+  if (ids.length) return ids;
+  const gms = game.users.filter((user) => user.isGM).map((user) => user.id);
+  return gms.length ? gms : [game.user.id];
+}
+
+function logPool(actor, delta, { heal, label, kind, word, whisper }) {
   if (!game.modules.get(HEALTH_MONITOR)?.active || !delta) return;
   const prelude = game.i18n.localize("Koboldworks.HealthMonitor.Card.Prelude");
   const change = game.i18n.localize(word || (heal
     ? "Koboldworks.HealthMonitor.Card.Gain"
     : "Koboldworks.HealthMonitor.Card.Lose"));
-  ChatMessage.create({
+  const message = {
     content: `<div class="koboldworks health-monitor"><span class="prelude">${prelude}</span> <span class="label">${change}</span> <span class="value">${Math.abs(delta)}</span> <span label="target">${label}</span></div>`,
     speaker: ChatMessage.getSpeaker({ actor }),
     flags: {
       [HEALTH_MONITOR]: { heal, target: kind, value: delta },
       [MODULE_ID]: { [`${kind}Feedback`]: true },
     },
-  });
+  };
+  if (whisper?.length && whisper.length < game.users.size) message.whisper = whisper;
+  ChatMessage.create(message);
 }
 
 function logShield(actor, delta) {
-  logPool(actor, delta, { heal: delta > 0, label: game.i18n.localize("CFUTIL.Shield.Label"), kind: "shield" });
+  logPool(actor, delta, {
+    heal: delta > 0,
+    label: game.i18n.localize("CFUTIL.Shield.Label"),
+    kind: "shield",
+    whisper: shieldAudience(actor),
+  });
 }
 
 function logBurn(actor, delta) {

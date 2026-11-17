@@ -13,6 +13,8 @@ export const CHANGE_TARGETS = {
   perCL: "cfSurgePerCL",
   shieldMax: "cfShieldMax",
   burn: "cfBurn",
+  shieldRegen: "cfShieldRegen",
+  shieldFastHealing: "cfShieldFastHeal",
 };
 
 /** Actor flag: normal | kh | kl */
